@@ -25,7 +25,7 @@
         <cdk.kubectl.version>2.0.0</cdk.kubectl.version>
         <kubernetes.models.version>7.3.1</kubernetes.models.version>
         <lombok.version>1.18.38</lombok.version>
-        <jackson.version>2.19.0</jackson.version>
+        <jackson.version>2.19.1</jackson.version>
         <mustache.version>0.9.14</mustache.version>
         <commons.io.version>2.19.0</commons.io.version>
         <commons.lang.version>3.17.0</commons.lang.version>
