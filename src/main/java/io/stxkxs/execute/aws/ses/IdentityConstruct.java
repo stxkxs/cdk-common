@@ -61,7 +61,7 @@ public class IdentityConstruct extends Construct {
     this.mxInboundRecord = MxRecord.Builder
       .create(this, "hostedzone.mx.inbound")
       .zone(hostedZone)
-      .recordName(String.format("mail.%s", conf.domain()))
+      .recordName(conf.domain())
       .values(List.of(MxRecordValue.builder()
         .hostName(String.format("inbound-smtp.%s.amazonaws.com", common.region()))
         .priority(10)
