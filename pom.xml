@@ -19,7 +19,7 @@
         <maven.exec.plugin.version>3.5.0</maven.exec.plugin.version>
         <maven.clean.plugin.version>3.4.0</maven.clean.plugin.version>
         <cdk.version>2.204.0</cdk.version>
-        <aws.sdk.version>2.31.73</aws.sdk.version>
+        <aws.sdk.version>2.31.77</aws.sdk.version>
         <aws.cognito.identitypool.version>2.186.0-alpha.0</aws.cognito.identitypool.version>
         <constructs.version>[10.4.0,11.0.0)</constructs.version>
         <cdk.kubectl.version>2.0.0</cdk.kubectl.version>
