@@ -27,7 +27,7 @@
         <lombok.version>1.18.38</lombok.version>
         <jackson.version>2.19.2</jackson.version>
         <mustache.version>0.9.14</mustache.version>
-        <commons.io.version>2.19.0</commons.io.version>
+        <commons.io.version>2.20.0</commons.io.version>
         <commons.lang.version>3.18.0</commons.lang.version>
         <commons.text.version>1.13.1</commons.text.version>
         <commons.codec.version>1.18.0</commons.codec.version>
