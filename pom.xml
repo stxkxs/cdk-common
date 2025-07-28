@@ -29,7 +29,7 @@
         <mustache.version>0.9.14</mustache.version>
         <commons.io.version>2.19.0</commons.io.version>
         <commons.lang.version>3.18.0</commons.lang.version>
-        <commons.text.version>1.13.1</commons.text.version>
+        <commons.text.version>1.14.0</commons.text.version>
         <commons.codec.version>1.18.0</commons.codec.version>
         <log4j2.version>2.25.1</log4j2.version>
     </properties>
