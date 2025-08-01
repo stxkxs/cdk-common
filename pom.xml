@@ -13,7 +13,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-        <common.cdk.version>1.0-SNAPSHOT</common.cdk.version>
         <maven.shade.plugin.version>3.6.0</maven.shade.plugin.version>
         <maven.compiler.plugin.version>3.14.0</maven.compiler.plugin.version>
         <maven.exec.plugin.version>3.5.0</maven.exec.plugin.version>
