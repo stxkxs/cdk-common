@@ -40,6 +40,70 @@ import java.util.Optional;
 
 import static io.stxkxs.execute.serialization.Format.id;
 
+/**
+ * Comprehensive Amazon EKS (Elastic Kubernetes Service) orchestration construct that provisions 
+ * a complete, production-ready Kubernetes cluster with all associated components.
+ * 
+ * <p>This nested stack serves as the main orchestrator for EKS infrastructure, coordinating
+ * multiple complex sub-constructs to create a fully functional Kubernetes environment:
+ * 
+ * <p><b>Core Components:</b>
+ * <ul>
+ *   <li><b>EKS Cluster</b> - Main Kubernetes control plane with custom endpoint access and logging</li>
+ *   <li><b>Node Groups</b> - Managed EC2 worker nodes with auto-scaling and custom AMI support</li>
+ *   <li><b>Managed Add-ons</b> - AWS-managed components (VPC CNI, kube-proxy, CoreDNS, EBS CSI)</li>
+ *   <li><b>Custom Add-ons</b> - Helm chart deployments (Grafana, cert-manager, Karpenter, AWS Load Balancer Controller)</li>
+ *   <li><b>Observability</b> - CloudWatch monitoring, logging, dashboards, and alerting</li>
+ *   <li><b>Interrupt Handling</b> - SQS queue for spot instance interruption notifications</li>
+ * </ul>
+ * 
+ * <p><b>Advanced Features:</b>
+ * <ul>
+ *   <li>Multi-tenant RBAC configuration with role-based access control</li>
+ *   <li>AWS IAM to Kubernetes RBAC integration via aws-auth ConfigMap</li>
+ *   <li>Dynamic tenant management from CDK context injection</li>
+ *   <li>Template-based configuration with mustache processing</li>
+ *   <li>Complex dependency orchestration ensuring proper startup order</li>
+ *   <li>Kubernetes manifest deployment for custom resources</li>
+ * </ul>
+ * 
+ * <p><b>Dependency Chain:</b>
+ * <pre>
+ * EKS Cluster (base)
+ *   ↓
+ * Interrupt Queue → Node Groups ← Managed Add-ons  
+ *   ↓                    ↓              ↓
+ * Custom Add-ons ←────────────────────────
+ *   ↓
+ * Observability (final)
+ * </pre>
+ * 
+ * <p><b>Security & Access Control:</b>
+ * <ul>
+ *   <li>Configurable cluster endpoint access (public, private, or both)</li>
+ *   <li>Integration with AWS IAM for cluster and node group roles</li>
+ *   <li>Support for hosted tenant administrators and users</li>
+ *   <li>Kubernetes RBAC policies for fine-grained permissions</li>
+ * </ul>
+ * 
+ * <p><b>Usage Example:</b>
+ * <pre>{@code
+ * EksNestedStack eksStack = new EksNestedStack(
+ *     app, common, kubernetesConfig, vpc, stackProps);
+ *     
+ * // Provides access to:
+ * Cluster cluster = eksStack.getCluster();
+ * IQueue interruptQueue = eksStack.getInterruptQueue();
+ * ManagedAddonsConstruct managedAddons = eksStack.getManagedAddonsConstruct();
+ * }</pre>
+ * 
+ * @author CDK Common Framework
+ * @since 1.0.0
+ * @see ManagedAddonsConstruct for AWS-managed EKS add-ons
+ * @see NodeGroupsConstruct for worker node management  
+ * @see AddonsConstruct for Helm chart deployments
+ * @see ObservabilityConstruct for monitoring and alerting
+ */
 @Slf4j
 @Getter
 public class EksNestedStack extends NestedStack {
@@ -53,6 +117,8 @@ public class EksNestedStack extends NestedStack {
   @SneakyThrows
   public EksNestedStack(Construct scope, Common common, KubernetesConf conf, Vpc vpc, NestedStackProps props) {
     super(scope, "eks", props);
+
+    log.debug("{} [common: {} conf: {} props: {}]", "EksNestedStack", common, conf, props);
 
     this.cluster = cluster(common, conf, vpc);
 

@@ -30,7 +30,7 @@ public class NetworkTargetGroupConstruct extends Construct {
   public NetworkTargetGroupConstruct(Construct scope, Common common, LoadBalancer conf, Vpc vpc, NetworkLoadBalancer networkLoadBalancer) {
     super(scope, id("network.target-group", conf.defaultTargetGroup().name()));
 
-    log.debug("network target group configuration [common: {} load-balancer: {}]", common, conf);
+    log.debug("{} [common: {} conf: {}]", "NetworkTargetGroupConstruct", common, conf);
 
     var target = conf.defaultTargetGroup();
     this.networkTargetGroup = NetworkTargetGroup.Builder

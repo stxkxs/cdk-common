@@ -26,7 +26,7 @@ public class BucketConstruct extends Construct {
   public BucketConstruct(Construct scope, Common common, S3Bucket conf) {
     super(scope, id("bucket", conf.name()));
 
-    log.debug("s3 bucket configuration [common: {} s3-bucket: {}]", common, conf);
+    log.debug("{} [common: {} conf: {}]", "BucketConstruct", common, conf);
 
     var bucket = Bucket.Builder
       .create(this, conf.name())

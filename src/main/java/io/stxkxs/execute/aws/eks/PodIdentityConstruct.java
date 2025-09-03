@@ -21,7 +21,7 @@ public class PodIdentityConstruct extends Construct {
   public PodIdentityConstruct(Construct scope, Common common, PodIdentity conf, ICluster cluster) {
     super(scope, id("pod-identity-association", conf.metadata().getName()));
 
-    log.debug("pod identity configuration [common: {} pod-identity: {}]", common, conf);
+    log.debug("{} [common: {} conf: {}]", "PodIdentityConstruct", common, conf);
 
     this.serviceAccountConstruct = new ServiceAccountConstruct(this, common, conf, cluster);
     this.association = CfnPodIdentityAssociation.Builder

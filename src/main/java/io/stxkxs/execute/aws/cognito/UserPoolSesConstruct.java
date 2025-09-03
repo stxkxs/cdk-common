@@ -22,7 +22,7 @@ public class UserPoolSesConstruct {
     var sesYaml = Template.parse(scope, conf.ses());
     var sesConf = Mapper.get().readValue(sesYaml, SesConf.class);
 
-    log.debug("userpool ses configuration [common: {} userpool: {} sns: {}]", common, conf, sesConf);
+    log.debug("{} [common: {} conf: {}]", "UserPoolSesConstruct", common, conf);
 
     if (sesConf.enabled()) {
       this.email = UserPoolEmail.withSES(

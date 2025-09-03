@@ -21,7 +21,7 @@ public class KmsConstruct extends Construct {
   public KmsConstruct(Construct scope, Common common, Kms conf) {
     super(scope, id("kms", conf.alias()));
 
-    log.debug("kms configuration [common: {} kms: {}]", common, conf);
+    log.debug("{} [common: {} conf: {}]", "KmsConstruct", common, conf);
 
     this.key = Key.Builder
       .create(this, conf.alias())

@@ -23,7 +23,7 @@ public class UserPoolSnsConstruct {
     var snsYaml = Template.parse(scope, conf.sns());
     var snsConf = Mapper.get().readValue(snsYaml, Sns.class);
 
-    log.debug("userpool sns configuration [common: {} userpool: {} sns: {}]", common, conf, snsConf);
+    log.debug("{} [common: {} conf: {}]", "UserPoolSnsConstruct", common, conf);
 
     this.role = new RoleConstruct(scope, common, snsConf.role()).role();
     this.externalId = snsConf.externalId();

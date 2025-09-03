@@ -46,6 +46,55 @@ import java.util.stream.Collectors;
 
 import static io.stxkxs.execute.serialization.Format.id;
 
+/**
+ * Comprehensive AWS Cognito User Pool construct that handles complete user authentication and management setup.
+ * 
+ * <p>This construct orchestrates the creation of a fully configured Cognito User Pool with support for:
+ * <ul>
+ *   <li><b>User Authentication</b> - Sign-in aliases, MFA, password policies</li>
+ *   <li><b>User Attributes</b> - Standard AWS attributes and custom attributes with various data types</li>
+ *   <li><b>External Integrations</b> - SES for email verification, SNS for SMS, Lambda triggers</li>
+ *   <li><b>User Management</b> - User groups, administrative actions, account recovery</li>
+ *   <li><b>Security</b> - Device tracking, account lockout, verification requirements</li>
+ * </ul>
+ * 
+ * <p><b>Key Features:</b>
+ * <ul>
+ *   <li>Dynamic standard attribute mapping with 20+ supported AWS Cognito attributes</li>
+ *   <li>Custom attribute creation with support for String, Number, DateTime, and Boolean types</li>
+ *   <li>Integrated email/SMS verification through SES/SNS constructs</li>
+ *   <li>Lambda trigger integration for authentication flow customization</li>
+ *   <li>Template-based configuration with mustache processing</li>
+ * </ul>
+ * 
+ * <p><b>Complexity Factors:</b>
+ * <ul>
+ *   <li>Extensive switch-case logic for mapping 20+ standard attribute types</li>
+ *   <li>Multi-service orchestration (Cognito, SES, SNS, Lambda, VPC)</li>
+ *   <li>Complex dependency management between sub-constructs</li>
+ *   <li>Runtime template parsing and configuration injection</li>
+ * </ul>
+ * 
+ * <p><b>Usage Example:</b>
+ * <pre>{@code
+ * UserPoolConf config = // loaded from template
+ * UserPoolConstruct userPool = new UserPoolConstruct(
+ *     this, common, config, vpc);
+ * 
+ * // Automatically creates:
+ * // - Cognito User Pool with configured attributes
+ * // - SES email verification (if configured)
+ * // - SNS SMS verification (if configured) 
+ * // - Lambda triggers (if configured)
+ * // - User groups and policies
+ * }</pre>
+ * 
+ * @author CDK Common Framework
+ * @since 1.0.0
+ * @see UserPoolTriggersConstruct for Lambda trigger management
+ * @see UserPoolSesConstruct for email verification setup
+ * @see UserPoolSnsConstruct for SMS verification setup
+ */
 @Slf4j
 @Getter
 public class UserPoolConstruct extends Construct {
@@ -59,7 +108,7 @@ public class UserPoolConstruct extends Construct {
     var userPoolYaml = Template.parse(scope, userPool);
     var userPoolConf = Mapper.get().readValue(userPoolYaml, UserPoolConf.class);
 
-    log.debug("userpool configuration [common: {} userpool: {}]", common, userPoolConf);
+    log.debug("{} [common: {} conf: {}]", "UserPoolConstruct", common, userPoolConf);
 
     var triggers = new UserPoolTriggersConstruct(this, common, vpc, userPoolConf).triggers();
     var ses = new UserPoolSesConstruct(this, common, userPoolConf);

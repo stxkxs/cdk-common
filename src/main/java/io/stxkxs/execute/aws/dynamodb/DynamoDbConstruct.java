@@ -31,6 +31,74 @@ import software.constructs.Construct;
 
 import static io.stxkxs.execute.serialization.Format.id;
 
+/**
+ * Comprehensive Amazon DynamoDB construct that provisions fully configured NoSQL tables 
+ * with advanced features including secondary indexes, encryption, backup, and auto-scaling.
+ * 
+ * <p>This construct handles the complete lifecycle of DynamoDB table creation with support for:
+ * 
+ * <p><b>Core Features:</b>
+ * <ul>
+ *   <li><b>Table Configuration</b> - Partition/sort keys, attributes, billing modes</li>
+ *   <li><b>Secondary Indexes</b> - Global Secondary Indexes (GSI) and Local Secondary Indexes (LSI)</li>
+ *   <li><b>Encryption</b> - KMS-based encryption at rest with custom or managed keys</li>
+ *   <li><b>Backup & Recovery</b> - Point-in-time recovery and backup vault integration</li>
+ *   <li><b>Auto-scaling</b> - Dynamic capacity scaling based on utilization</li>
+ *   <li><b>Streaming</b> - DynamoDB Streams for change data capture</li>
+ * </ul>
+ * 
+ * <p><b>Advanced Capabilities:</b>
+ * <ul>
+ *   <li>Dynamic attribute schema building with type inference</li>
+ *   <li>Conditional index creation based on configuration</li>
+ *   <li>Flexible billing mode support (On-Demand vs Provisioned)</li>
+ *   <li>Custom table classes (Standard vs Infrequent Access)</li>
+ *   <li>Template-based configuration with runtime value injection</li>
+ *   <li>Comprehensive tagging strategy with inheritance</li>
+ * </ul>
+ * 
+ * <p><b>Index Management:</b>
+ * <ul>
+ *   <li><b>Global Secondary Indexes</b> - Independent partition/sort keys with separate capacity</li>
+ *   <li><b>Local Secondary Indexes</b> - Alternative sort key sharing partition key</li>
+ *   <li><b>Projection Types</b> - Keys only, include specific attributes, or all attributes</li>
+ *   <li><b>Auto-scaling</b> - Independent scaling policies per index</li>
+ * </ul>
+ * 
+ * <p><b>Security & Compliance:</b>
+ * <ul>
+ *   <li>KMS encryption with customer-managed or AWS-managed keys</li>
+ *   <li>IAM-based access control integration</li>
+ *   <li>VPC endpoint support for private access</li>
+ *   <li>Backup encryption and retention policies</li>
+ * </ul>
+ * 
+ * <p><b>Configuration Processing:</b>
+ * The construct supports complex configuration scenarios including conditional
+ * resource creation, template-based parameter injection, and dynamic schema building
+ * based on application requirements.
+ * 
+ * <p><b>Usage Example:</b>
+ * <pre>{@code
+ * Table tableConfig = // loaded from configuration
+ * DynamoDbConstruct table = new DynamoDbConstruct(
+ *     this, common, tableConfig);
+ *     
+ * // Automatically configures:
+ * // - Primary table with partition/sort keys
+ * // - Global and Local Secondary Indexes  
+ * // - KMS encryption and backup policies
+ * // - Auto-scaling for table and indexes
+ * // - DynamoDB Streams (if enabled)
+ * }</pre>
+ * 
+ * @author CDK Common Framework
+ * @since 1.0.0
+ * @see TableV2 for the underlying DynamoDB table resource
+ * @see GlobalSecondaryIndexPropsV2 for GSI configuration
+ * @see LocalSecondaryIndexProps for LSI configuration  
+ * @see KmsConstruct for encryption key management
+ */
 @Slf4j
 @Getter
 public class DynamoDbConstruct extends Construct {
@@ -39,7 +107,7 @@ public class DynamoDbConstruct extends Construct {
   public DynamoDbConstruct(Construct scope, Common common, Table conf) {
     super(scope, id("dynamodb", conf.name()));
 
-    log.debug("configuration [common: {} table: {}]", common, conf);
+    log.debug("{} [common: {} conf: {}]", "DynamoDbConstruct", common, conf);
 
     var table = Builder
       .create(this, conf.name())

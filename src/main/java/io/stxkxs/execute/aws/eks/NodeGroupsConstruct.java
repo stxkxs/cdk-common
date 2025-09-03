@@ -24,7 +24,7 @@ public class NodeGroupsConstruct extends Construct {
   public NodeGroupsConstruct(Construct scope, String id, Common common, List<NodeGroup> conf, ICluster cluster) {
     super(scope, id("nodegroups", id));
 
-    log.debug("node groups configuration [common: {} node-groups: {}]", common, conf);
+    log.debug("{} [common: {} conf: {}]", "NodeGroupsConstruct", common, conf);
 
     this.nodeGroups = conf.stream()
       .map(nodeGroup -> {

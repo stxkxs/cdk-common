@@ -26,7 +26,7 @@ public class MskConstruct extends Construct {
   public MskConstruct(Construct scope, Common common, Msk conf, Vpc vpc, List<String> securityGroupIds) {
     super(scope, id("msk", conf.name()));
 
-    log.debug("msk configuration [common: {} msk: {}]", common, conf);
+    log.debug("{} [common: {} conf: {}]", "MskConstruct", common, conf);
 
     this.msk = CfnServerlessCluster.Builder
       .create(this, conf.name())

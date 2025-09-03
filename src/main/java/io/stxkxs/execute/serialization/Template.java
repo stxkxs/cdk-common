@@ -16,6 +16,110 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Advanced template processing engine that provides dynamic configuration injection using 
+ * Mustache templating with comprehensive CDK context integration and environment-aware resource resolution.
+ * 
+ * <p>This class serves as the core template processing system for the entire CDK framework,
+ * enabling dynamic configuration generation with runtime value injection, environment-specific
+ * customization, and context-aware parameter substitution across all infrastructure components.
+ * 
+ * <p><b>Core Template Capabilities:</b>
+ * <ul>
+ *   <li><b>Mustache Integration</b> - Logic-less templates with variable substitution</li>
+ *   <li><b>Environment Awareness</b> - Environment-specific template resolution and processing</li>
+ *   <li><b>Version Support</b> - Version-based template organization and selection</li>
+ *   <li><b>Context Integration</b> - Deep CDK context system integration with automatic variable injection</li>
+ * </ul>
+ * 
+ * <p><b>Template Resolution Architecture:</b>
+ * Templates are organized in a hierarchical structure:
+ * <pre>
+ * resources/
+ *   ├── {environment}/     (dev, staging, production)
+ *   │   ├── {version}/     (v1.0, v2.0, etc.)
+ *   │   │   ├── eks/       (service-specific templates)
+ *   │   │   ├── cognito/
+ *   │   │   └── ...
+ * </pre>
+ * 
+ * <p><b>Context Variable Injection:</b>
+ * The template engine automatically provides extensive context variables:
+ * <ul>
+ *   <li><b>Host Context</b> - Primary deployment environment variables (host:account, host:region, etc.)</li>
+ *   <li><b>Hosted Context</b> - Secondary deployment context for nested stacks</li>
+ *   <li><b>Synthesizer Context</b> - CDK synthesizer and build tool context</li>
+ *   <li><b>Custom Variables</b> - Additional user-provided template variables</li>
+ * </ul>
+ * 
+ * <p><b>Multi-Environment Support:</b>
+ * <ul>
+ *   <li><b>Environment-Specific Templates</b> - Different templates for dev, staging, production</li>
+ *   <li><b>Version Management</b> - Multiple template versions for gradual rollouts</li>
+ *   <li><b>Fallback Logic</b> - Graceful handling of missing templates or context</li>
+ *   <li><b>Cross-Environment Consistency</b> - Shared template patterns with environment overrides</li>
+ * </ul>
+ * 
+ * <p><b>Advanced Template Features:</b>
+ * <ul>
+ *   <li><b>Variable Merging</b> - Priority-based merging of default and custom variables</li>
+ *   <li><b>Nested Context</b> - Support for complex nested variable structures</li>
+ *   <li><b>Runtime Resolution</b> - Dynamic resource ARN and identifier resolution</li>
+ *   <li><b>Error Handling</b> - Comprehensive error reporting for missing templates or variables</li>
+ * </ul>
+ * 
+ * <p><b>Security and Validation:</b>
+ * <ul>
+ *   <li><b>Resource Loading</b> - Secure classpath-based template loading</li>
+ *   <li><b>Input Validation</b> - Template path validation and sanitization</li>
+ *   <li><b>Context Validation</b> - Required context variable verification</li>
+ *   <li><b>Template Compilation</b> - Pre-compilation for performance and validation</li>
+ * </ul>
+ * 
+ * <p><b>Performance Optimization:</b>
+ * <ul>
+ *   <li><b>Template Caching</b> - Compiled template caching for repeated use</li>
+ *   <li><b>Lazy Loading</b> - Templates loaded only when needed</li>
+ *   <li><b>Stream Processing</b> - Efficient I/O with proper resource management</li>
+ *   <li><b>Memory Management</b> - Proper cleanup of template resources</li>
+ * </ul>
+ * 
+ * <p><b>Integration Patterns:</b>
+ * The template system integrates with various CDK components:
+ * <ul>
+ *   <li>Configuration object parsing and instantiation</li>
+ *   <li>Kubernetes manifest generation with dynamic values</li>
+ *   <li>AWS service configuration with environment-specific parameters</li>
+ *   <li>Multi-tenant deployment scenarios with tenant-specific customization</li>
+ * </ul>
+ * 
+ * <p><b>Usage Examples:</b>
+ * <pre>{@code
+ * // Basic template parsing with default context
+ * String processedConfig = Template.parse(scope, "eks/cluster-config.json");
+ * 
+ * // Template parsing with additional variables
+ * Map<String, Object> customVars = Map.of(
+ *     "clusterSize", "large",
+ *     "enableLogging", true
+ * );
+ * String config = Template.parse(scope, "eks/cluster-config.json", customVars);
+ * 
+ * // Typical usage in construct
+ * var nodeGroupsConfig = Mapper.get().readValue(
+ *     Template.parse(this, conf.nodeGroups()), 
+ *     new TypeReference<List<NodeGroup>>() {}
+ * );
+ * }</pre>
+ * 
+ * @author CDK Common Framework
+ * @since 1.0.0
+ * @see DefaultMustacheFactory for mustache template processing
+ * @see Mapper for JSON/YAML processing integration
+ * @see Common for context and metadata management
+ * @see Environment for environment-specific processing
+ * @see Version for version management integration
+ */
 @Slf4j
 public class Template {
 

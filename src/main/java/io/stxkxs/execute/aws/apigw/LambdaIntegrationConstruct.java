@@ -20,6 +20,100 @@ import java.util.Optional;
 
 import static java.util.stream.Collectors.toMap;
 
+/**
+ * Sophisticated Amazon API Gateway to AWS Lambda integration construct that provides comprehensive
+ * serverless API functionality with advanced routing, method configuration, and Lambda proxy integration.
+ * 
+ * <p>This construct serves as the bridge between API Gateway and Lambda functions, enabling complete
+ * serverless API architectures with sophisticated request/response handling, authorization patterns,
+ * and multi-method resource configuration.
+ * 
+ * <p><b>Core Integration Features:</b>
+ * <ul>
+ *   <li><b>Lambda Proxy Integration</b> - Full Lambda proxy integration with automatic request/response transformation</li>
+ *   <li><b>Resource Hierarchies</b> - Support for nested API Gateway resources with path parameters</li>
+ *   <li><b>Method Configuration</b> - Multiple HTTP methods per resource with individual configuration</li>
+ *   <li><b>Request Validation</b> - Integration with request models and validators</li>
+ * </ul>
+ * 
+ * <p><b>Advanced Configuration Capabilities:</b>
+ * <ul>
+ *   <li><b>VPC Integration</b> - Lambda functions deployed within VPC with proper networking</li>
+ *   <li><b>Layer Management</b> - Support for multiple Lambda layers and dependencies</li>
+ *   <li><b>Authorization Integration</b> - Seamless integration with API Gateway authorizers</li>
+ *   <li><b>CORS Configuration</b> - Automatic CORS handling for web application integration</li>
+ * </ul>
+ * 
+ * <p><b>Resource Management Architecture:</b>
+ * The construct handles complex API Gateway resource hierarchies:
+ * <ul>
+ *   <li><b>Parent-Child Resources</b> - Nested resource structures with proper path construction</li>
+ *   <li><b>Path Parameters</b> - Dynamic path segments with parameter extraction</li>
+ *   <li><b>Resource Methods</b> - Multiple HTTP methods per resource endpoint</li>
+ *   <li><b>Method Options</b> - Individual method configuration including validation and authorization</li>
+ * </ul>
+ * 
+ * <p><b>Lambda Integration Patterns:</b>
+ * <ul>
+ *   <li><b>Proxy Integration</b> - Complete request forwarding to Lambda with automatic response handling</li>
+ *   <li><b>Request Transformation</b> - Optional request/response transformation and mapping</li>
+ *   <li><b>Error Handling</b> - Automatic error response mapping and status code handling</li>
+ *   <li><b>Performance Optimization</b> - Connection pooling and Lambda warm-up strategies</li>
+ * </ul>
+ * 
+ * <p><b>Template-Based Configuration:</b>
+ * Supports dynamic configuration through template processing:
+ * <ul>
+ *   <li><b>Environment-Specific Settings</b> - Different configurations per deployment environment</li>
+ *   <li><b>Runtime Parameter Injection</b> - Dynamic resource ARNs and configuration values</li>
+ *   <li><b>Integration Mappings</b> - Configurable request/response transformations</li>
+ * </ul>
+ * 
+ * <p><b>Security and Authorization:</b>
+ * <ul>
+ *   <li><b>Method-Level Security</b> - Individual authorization configuration per HTTP method</li>
+ *   <li><b>Request Validation</b> - Input validation using request models and validators</li>
+ *   <li><b>Lambda Permissions</b> - Automatic Lambda execution permissions for API Gateway</li>
+ *   <li><b>VPC Security</b> - Secure Lambda deployment within private subnets</li>
+ * </ul>
+ * 
+ * <p><b>Integration Flow:</b>
+ * <pre>
+ * API Gateway Request → Resource Resolution → Method Selection → Lambda Integration → Response
+ *        ↓                      ↓                   ↓                ↓               ↓
+ * Path Parsing → Parameter Extraction → Validation → Function Execution → Transformation
+ * </pre>
+ * 
+ * <p><b>Usage Example:</b>
+ * <pre>{@code
+ * // Create Lambda integration with API Gateway resource
+ * IResource apiResource = LambdaIntegrationConstruct.get(
+ *     this,                    // construct scope
+ *     common,                  // common configuration
+ *     "user-api-config.json",  // integration configuration reference
+ *     vpc,                     // VPC for Lambda deployment
+ *     restApiConstruct,        // parent REST API
+ *     parentResource,          // parent API Gateway resource
+ *     requestModels,           // validation models
+ *     commonLayer,             // Lambda layers
+ *     utilityLayer
+ * );
+ * 
+ * // The method automatically:
+ * // - Creates Lambda function with VPC integration
+ * // - Sets up API Gateway resource hierarchy
+ * // - Configures HTTP methods with proxy integration
+ * // - Applies request validation and authorization
+ * // - Manages Lambda execution permissions
+ * }</pre>
+ * 
+ * @author CDK Common Framework
+ * @since 1.0.0
+ * @see LambdaConstruct for Lambda function provisioning
+ * @see RestApiConstruct for API Gateway setup
+ * @see Integration for integration configuration model
+ * @see ApiGatewayLambda for Lambda-specific API configuration
+ */
 @Slf4j
 public class LambdaIntegrationConstruct {
 
@@ -36,7 +130,7 @@ public class LambdaIntegrationConstruct {
     var conf = parse(scope, ref);
     var fn = new LambdaConstruct(scope, common, conf.fn(), vpc, layers).function();
 
-    log.debug("rest api integration configuration with indeterminate layers [common: {} integration: {}]", common, conf);
+    log.debug("{} [common: {} conf: {}]", "LambdaIntegrationConstruct", common, conf);
 
     return integrate(scope, null, stack, parent, requestModels, conf, fn);
   }
@@ -55,7 +149,7 @@ public class LambdaIntegrationConstruct {
     var conf = parse(scope, ref);
     var fn = new LambdaConstruct(scope, common, conf.fn(), vpc, baseLayer).function();
 
-    log.debug("rest api integration configuration with base layer [common: {} integration: {}]", common, conf);
+    log.debug("{} [common: {} conf: {}]", "LambdaIntegrationConstruct", common, conf);
 
     return integrate(scope, authorizer, stack, parent, requestModels, conf, fn);
   }
@@ -73,7 +167,7 @@ public class LambdaIntegrationConstruct {
     var conf = parse(scope, ref);
     var fn = new LambdaConstruct(scope, common, conf.fn(), vpc).function();
 
-    log.debug("rest api integration configuration [common: {} integration: {}]", common, conf);
+    log.debug("{} [common: {} conf: {}]", "LambdaIntegrationConstruct", common, conf);
 
     return integrate(scope, authorizer, stack, parent, requestModels, conf, fn);
   }

@@ -1,17 +1,16 @@
 package io.stxkxs.execute.aws.eks;
 
-
+import io.stxkxs.execute.serialization.Mapper;
+import io.stxkxs.execute.serialization.Template;
 import io.stxkxs.model._main.Common;
 import io.stxkxs.model.aws.eks.KubernetesConf;
 import io.stxkxs.model.aws.eks.addon.AddonsConf;
-import io.stxkxs.model.aws.eks.addon.AwsLoadBalancerConstruct;
-import io.stxkxs.model.aws.eks.addon.AwsSecretsStoreConstruct;
-import io.stxkxs.model.aws.eks.addon.CertManagerConstruct;
-import io.stxkxs.model.aws.eks.addon.CsiSecretsStoreConstruct;
-import io.stxkxs.model.aws.eks.addon.GrafanaConstruct;
-import io.stxkxs.model.aws.eks.addon.KarpenterConstruct;
-import io.stxkxs.execute.serialization.Mapper;
-import io.stxkxs.execute.serialization.Template;
+import io.stxkxs.execute.aws.eks.addon.AwsLoadBalancerConstruct;
+import io.stxkxs.execute.aws.eks.addon.AwsSecretsStoreConstruct;
+import io.stxkxs.execute.aws.eks.addon.CertManagerConstruct;
+import io.stxkxs.execute.aws.eks.addon.CsiSecretsStoreConstruct;
+import io.stxkxs.execute.aws.eks.addon.GrafanaConstruct;
+import io.stxkxs.execute.aws.eks.addon.KarpenterConstruct;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +18,7 @@ import software.amazon.awscdk.services.eks.Cluster;
 import software.constructs.Construct;
 
 import static io.stxkxs.execute.serialization.Format.id;
+
 @Slf4j
 @Getter
 public class AddonsConstruct extends Construct {
@@ -32,6 +32,8 @@ public class AddonsConstruct extends Construct {
   @SneakyThrows
   public AddonsConstruct(Construct scope, Common common, KubernetesConf conf, Cluster cluster) {
     super(scope, id("eks.addons", conf.name()));
+
+    log.debug("{} [common: {} conf: {}]", "AddonsConstruct", common, conf);
 
     var addons = Mapper.get().readValue(Template.parse(scope, conf.addons()), AddonsConf.class);
 

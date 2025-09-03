@@ -39,7 +39,7 @@ public class UserPoolClientConstruct extends Construct {
     var yaml = Template.parse(scope, path);
     var conf = Mapper.get().readValue(yaml, UserPoolClientConf.class);
 
-    log.debug("userpool client configuration [common: {} userpool-client: {}]", common, conf);
+    log.debug("{} [common: {} conf: {}]", "UserPoolClientConstruct", common, conf);
 
     this.userPoolClient = parent.addClient(
       conf.name(),

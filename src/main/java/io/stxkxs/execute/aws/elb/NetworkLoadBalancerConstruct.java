@@ -24,7 +24,7 @@ public class NetworkLoadBalancerConstruct extends Construct {
   public NetworkLoadBalancerConstruct(Construct scope, Common common, LoadBalancer conf, Vpc vpc, List<SecurityGroup> securityGroups) {
     super(scope, id("network.loadbalancer", conf.name()));
 
-    log.debug("network loadbalancer configuration [common: {} load-balancer: {}]", common, conf);
+    log.debug("{} [common: {} conf: {}]", "NetworkLoadBalancerConstruct", common, conf);
 
     this.networkLoadBalancer = NetworkLoadBalancer.Builder
       .create(this, conf.name())

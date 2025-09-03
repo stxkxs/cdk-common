@@ -46,7 +46,7 @@ public class ProjectConstruct extends Construct {
     var yaml = Template.parse(this, conf.buildspec());
     var buildspec = Mapper.get().readValue(yaml, new TypeReference<Map<String, Object>>() {});
 
-    log.debug("codebuild project configuration [common: {} codebuild-project: {}]", common, conf);
+    log.debug("{} [common: {} conf: {}]", "ProjectConstruct", common, conf);
 
     this.assets = assets;
     this.role = role;

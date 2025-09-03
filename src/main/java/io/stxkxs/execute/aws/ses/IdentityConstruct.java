@@ -33,7 +33,7 @@ public class IdentityConstruct extends Construct {
   public IdentityConstruct(Construct scope, Common common, IdentityConf conf) {
     super(scope, "ses.identity");
 
-    log.debug("ses identity configuration [common: {} ses-identity: {}]", common, conf);
+    log.debug("{} [common: {} conf: {}]", "IdentityConstruct", common, conf);
 
     var hostedZone = PublicHostedZone
       .fromPublicHostedZoneAttributes(this, "hostedzone.lookup",

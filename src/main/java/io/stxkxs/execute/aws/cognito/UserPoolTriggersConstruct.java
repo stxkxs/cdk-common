@@ -31,7 +31,7 @@ public class UserPoolTriggersConstruct {
 
   @SneakyThrows
   public UserPoolTriggersConstruct(Construct scope, Common common, IVpc vpc, UserPoolConf conf) {
-    log.debug("userpool trigger configuration [common: {} userpool: {}]", common, conf);
+    log.debug("{} [common: {} conf: {}]", "UserPoolTriggersConstruct", common, conf);
 
     var triggersYaml = Template.parse(scope, conf.triggers());
     var triggers = Mapper.get().readValue(triggersYaml, Triggers.class);

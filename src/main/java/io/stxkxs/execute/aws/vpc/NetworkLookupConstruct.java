@@ -20,7 +20,7 @@ public class NetworkLookupConstruct extends Construct {
   public NetworkLookupConstruct(Construct scope, Common common, String name) {
     super(scope, id("network.lookup", name));
 
-    log.debug("network lookup [common: {} name: {}]", common, name);
+    log.debug("{} [common: {}]", "NetworkLookupConstruct", common);
 
     if ("true".equals(scope.getNode().tryGetContext("synthesizer"))) {
       log.warn("executing cdk synth ... --context synthesizer ... to validate stack without vpc lookup!");

@@ -21,7 +21,7 @@ public class SecurityGroupConstruct extends Construct {
   public SecurityGroupConstruct(Construct scope, Common common, SecurityGroup conf, Vpc vpc) {
     super(scope, id("security-group", conf.name()));
 
-    log.debug("security group configuration [common: {} security-group: {}]", common, conf);
+    log.debug("{} [common: {} conf: {}]", "SecurityGroupConstruct", common, conf);
 
     this.securityGroup = software.amazon.awscdk.services.ec2.SecurityGroup.Builder
       .create(this, conf.name())

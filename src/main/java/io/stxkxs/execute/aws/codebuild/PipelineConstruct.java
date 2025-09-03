@@ -27,7 +27,7 @@ public class PipelineConstruct extends Construct {
   public PipelineConstruct(Construct scope, Common common, Pipeline conf, IBucket assets, IRole role) {
     super(scope, "pipeline");
 
-    log.debug("codepipeline configuration [common: {} codepipeline: {}]", common, conf);
+    log.debug("{} [common: {} conf: {}]", "PipelineConstruct", common, conf);
 
     var variables = conf
       .variables()

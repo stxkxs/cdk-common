@@ -26,7 +26,7 @@ public class LogGroupConstruct extends Construct {
   public LogGroupConstruct(Construct scope, Common common, LogGroupConf conf) {
     super(scope, id("log-group", conf.name()));
 
-    log.debug("log group configuration [common: {} log-group: {}]", common, conf);
+    log.debug("{} [common: {} conf: {}]", "LogGroupConstruct", common, conf);
 
     var builder = LogGroup.Builder
       .create(this, id("cloudwatch.log-group", conf.name()))

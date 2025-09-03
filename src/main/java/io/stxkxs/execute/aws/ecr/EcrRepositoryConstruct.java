@@ -20,7 +20,7 @@ public class EcrRepositoryConstruct extends Construct {
   public EcrRepositoryConstruct(Construct scope, Common common, EcrRepository conf) {
     super(scope, id("ecr", conf.name()));
 
-    log.debug("ecr configuration [common: {} repository: {}]", common, conf);
+    log.debug("{} [common: {} conf: {}]", "EcrRepositoryConstruct", common, conf);
 
     var ecr = Repository.Builder
       .create(scope, "ecr")

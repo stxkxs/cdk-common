@@ -1,37 +1,41 @@
-package io.stxkxs.model.aws.eks.addon;
+package io.stxkxs.execute.aws.eks.addon;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.stxkxs.execute.aws.eks.NamespaceConstruct;
-import io.stxkxs.execute.aws.eks.PodIdentityConstruct;
+import io.stxkxs.execute.aws.eks.ServiceAccountConstruct;
 import io.stxkxs.execute.serialization.Mapper;
 import io.stxkxs.execute.serialization.Template;
 import io.stxkxs.model._main.Common;
-import io.stxkxs.model.aws.eks.addon.core.karpenter.KarpenterAddon;
+import io.stxkxs.model.aws.eks.addon.core.AwsLoadBalancerAddon;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import software.amazon.awscdk.Duration;
 import software.amazon.awscdk.services.eks.HelmChart;
 import software.amazon.awscdk.services.eks.ICluster;
-import software.amazon.awscdk.services.eks.KubernetesManifest;
 import software.constructs.Construct;
 
 import java.util.Map;
 
 import static io.stxkxs.execute.serialization.Format.id;
 
+@Slf4j
 @Getter
-public class KarpenterConstruct extends Construct {
-  private final KubernetesManifest namespace;
+public class AwsLoadBalancerConstruct extends Construct {
+  private final NamespaceConstruct namespace;
+  private final ServiceAccountConstruct serviceAccount;
   private final HelmChart chart;
-  private final PodIdentityConstruct podIdentity;
 
   @SneakyThrows
-  public KarpenterConstruct(Construct scope, Common common, KarpenterAddon conf, ICluster cluster) {
-    super(scope, id("karpenter"));
+  public AwsLoadBalancerConstruct(Construct scope, Common common, AwsLoadBalancerAddon conf, ICluster cluster) {
+    super(scope, id("awsloadbalancer", conf.chart().release()));
 
-    this.namespace = new NamespaceConstruct(this, common, conf.podIdentity().metadata(), cluster).manifest();
-    this.podIdentity = new PodIdentityConstruct(this, common, conf.podIdentity(), cluster);
-    this.podIdentity().getNode().addDependency(this.namespace());
+    log.debug("{} [common: {} conf: {}]", "AwsLoadBalancerConstruct", common, conf);
+
+    this.namespace = new NamespaceConstruct(this, common, conf.serviceAccount().metadata(), cluster);
+
+    this.serviceAccount = new ServiceAccountConstruct(this, common, conf.serviceAccount(), cluster);
+    this.serviceAccount().getNode().addDependency(this.namespace());
 
     var values = Mapper.get().readValue(Template.parse(scope, conf.chart().values()), new TypeReference<Map<String, Object>>() {});
     this.chart = HelmChart.Builder
@@ -40,7 +44,7 @@ public class KarpenterConstruct extends Construct {
       .wait(true)
       .timeout(Duration.minutes(15))
       .skipCrds(false)
-      .createNamespace(false)
+      .createNamespace(true)
       .chart(conf.chart().name())
       .namespace(conf.chart().namespace())
       .repository(conf.chart().repository())
@@ -49,6 +53,6 @@ public class KarpenterConstruct extends Construct {
       .values(values)
       .build();
 
-    this.chart().getNode().addDependency(this.podIdentity());
+    this.chart().getNode().addDependency(this.serviceAccount());
   }
 }

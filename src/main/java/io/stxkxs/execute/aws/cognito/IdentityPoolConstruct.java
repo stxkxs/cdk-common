@@ -31,6 +31,117 @@ import software.constructs.Construct;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Comprehensive AWS Cognito Identity Pool construct that provides sophisticated federated identity
+ * management with role mapping, external identity provider integration, and advanced authentication patterns.
+ * 
+ * <p>This construct orchestrates the creation of Cognito Identity Pools with complex role-based access
+ * control, supporting multiple authentication providers, custom resource provisioning, and advanced
+ * identity federation scenarios for multi-platform applications.
+ * 
+ * <p><b>Core Identity Federation Features:</b>
+ * <ul>
+ *   <li><b>Identity Pool Creation</b> - Cognito Identity Pool with federated identity support</li>
+ *   <li><b>Role Mapping</b> - Sophisticated IAM role assignment based on authentication state</li>
+ *   <li><b>Authentication Providers</b> - Integration with User Pools, SAML, OIDC, and social providers</li>
+ *   <li><b>Custom Resource Management</b> - AWS SDK-based custom resources for advanced configuration</li>
+ * </ul>
+ * 
+ * <p><b>Advanced Authentication Patterns:</b>
+ * <ul>
+ *   <li><b>Multi-Provider Support</b> - User Pools, Facebook, Google, Amazon, Twitter, SAML, OIDC</li>
+ *   <li><b>Role-Based Access</b> - Different IAM roles for authenticated vs unauthenticated users</li>
+ *   <li><b>Dynamic Role Assignment</b> - Context-based role mapping with custom rules</li>
+ *   <li><b>Cross-Platform Identity</b> - Unified identity across web, mobile, and server applications</li>
+ * </ul>
+ * 
+ * <p><b>IAM Integration Architecture:</b>
+ * The construct provides sophisticated IAM role management:
+ * <ul>
+ *   <li><b>Authenticated Roles</b> - Full-access roles for verified users</li>
+ *   <li><b>Unauthenticated Roles</b> - Limited-access roles for anonymous users</li>
+ *   <li><b>Custom Role Mapping</b> - Advanced role selection based on user attributes</li>
+ *   <li><b>Policy Templates</b> - Template-based policy generation with environment variables</li>
+ * </ul>
+ * 
+ * <p><b>Custom Resource Integration:</b>
+ * Uses AWS Custom Resources for advanced configuration:
+ * <ul>
+ *   <li><b>SDK-Based Operations</b> - Direct AWS SDK calls for Identity Pool configuration</li>
+ *   <li><b>Advanced Settings</b> - Configuration options not available in CDK constructs</li>
+ *   <li><b>Dynamic Updates</b> - Runtime configuration changes through custom resources</li>
+ *   <li><b>Error Handling</b> - Robust error handling and rollback mechanisms</li>
+ * </ul>
+ * 
+ * <p><b>External Provider Integration:</b>
+ * <ul>
+ *   <li><b>SAML Providers</b> - Enterprise identity provider integration</li>
+ *   <li><b>OIDC Providers</b> - OpenID Connect federation</li>
+ *   <li><b>Social Providers</b> - Facebook, Google, Amazon, Twitter integration</li>
+ *   <li><b>Developer Providers</b> - Custom authentication backend integration</li>
+ * </ul>
+ * 
+ * <p><b>Security and Compliance:</b>
+ * <ul>
+ *   <li><b>Principle of Least Privilege</b> - Minimal necessary permissions for each role</li>
+ *   <li><b>Cross-Account Access</b> - Support for cross-account identity federation</li>
+ *   <li><b>Audit Trail</b> - CloudTrail integration for identity operations</li>
+ *   <li><b>Compliance Ready</b> - GDPR, HIPAA, and SOC compliance considerations</li>
+ * </ul>
+ * 
+ * <p><b>Template-Based Configuration:</b>
+ * Supports dynamic configuration through template processing:
+ * <ul>
+ *   <li><b>Environment-Specific Providers</b> - Different identity providers per environment</li>
+ *   <li><b>Dynamic Role Policies</b> - Environment-specific IAM permissions</li>
+ *   <li><b>Provider Configuration</b> - Parameterized external provider settings</li>
+ * </ul>
+ * 
+ * <p><b>Identity Flow Architecture:</b>
+ * <pre>
+ * External Provider → Identity Pool → Role Mapping → AWS Credentials → Resource Access
+ *        ↓                 ↓              ↓              ↓                   ↓
+ * Authentication → Token Exchange → Role Selection → STS AssumeRole → API Calls
+ * </pre>
+ * 
+ * <p><b>Multi-Platform Support:</b>
+ * <ul>
+ *   <li><b>Web Applications</b> - JavaScript SDK integration with CORS support</li>
+ *   <li><b>Mobile Apps</b> - iOS and Android SDK integration</li>
+ *   <li><b>Server Applications</b> - Backend service integration</li>
+ *   <li><b>Hybrid Architectures</b> - Mixed client/server authentication patterns</li>
+ * </ul>
+ * 
+ * <p><b>Usage Example:</b>
+ * <pre>{@code
+ * IdentityPoolConstruct identityPool = new IdentityPoolConstruct(
+ *     this, 
+ *     common, 
+ *     identityPoolConfig, 
+ *     userPool, 
+ *     userPoolClient, 
+ *     restApi
+ * );
+ * 
+ * // Automatically creates:
+ * // - Cognito Identity Pool with provider configuration
+ * // - IAM roles for authenticated and unauthenticated users
+ * // - Role mapping rules for dynamic role assignment
+ * // - Custom resources for advanced configuration
+ * // - Integration with external identity providers
+ * 
+ * // Access the created resources
+ * IdentityPool pool = identityPool.getIdentityPool();
+ * Role authRole = identityPool.getAuthenticatedRole();
+ * }</pre>
+ * 
+ * @author CDK Common Framework
+ * @since 1.0.0
+ * @see IdentityPool for AWS CDK Identity Pool construct
+ * @see RoleConstruct for IAM role provisioning
+ * @see AwsCustomResource for custom resource operations
+ * @see IdentityPoolConf for configuration model
+ */
 @Slf4j
 @Getter
 public class IdentityPoolConstruct extends Construct {
@@ -44,7 +155,7 @@ public class IdentityPoolConstruct extends Construct {
     var conf = parse(scope, identityPool, Map.of("hosted:api:id",
       CfnJson.Builder.create(this, "api.id").value(api.getRestApiId()).build().getValue()));
 
-    log.debug("identity pool configuration [common: {} identity-pool: {}]", common, conf);
+    log.debug("{} [common: {} conf: {}]", "IdentityPoolConstruct", common, conf);
 
     this.authenticatedRole = new RoleConstruct(this, common, conf.authenticated()).role();
 

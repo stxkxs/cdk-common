@@ -31,6 +31,81 @@ import java.util.stream.Collectors;
 import static io.stxkxs.execute.serialization.Format.id;
 import static java.util.stream.Collectors.toMap;
 
+/**
+ * Comprehensive Amazon API Gateway REST API construct that provisions fully configured
+ * API endpoints with validation, authorization, logging, and monitoring capabilities.
+ * 
+ * <p>This construct provides enterprise-grade API Gateway setup with advanced features:
+ * 
+ * <p><b>Core API Features:</b>
+ * <ul>
+ *   <li><b>REST API Creation</b> - Configurable API with custom domain and endpoint types</li>
+ *   <li><b>Request Validation</b> - Schema-based validation for request bodies and parameters</li>
+ *   <li><b>Response Models</b> - Structured response schemas for API documentation</li>
+ *   <li><b>Authorization</b> - Integration with Cognito User Pools and IAM</li>
+ *   <li><b>Logging & Monitoring</b> - CloudWatch integration with custom log formats</li>
+ * </ul>
+ * 
+ * <p><b>Validation & Schema Management:</b>
+ * <ul>
+ *   <li><b>Request Validators</b> - Body and parameter validation with custom rules</li>
+ *   <li><b>JSON Schema Models</b> - Dynamic model creation from configuration</li>
+ *   <li><b>Response Templates</b> - Structured response formatting and error handling</li>
+ *   <li><b>Content Type Handling</b> - Multi-format request/response processing</li>
+ * </ul>
+ * 
+ * <p><b>Authorization Integration:</b>
+ * <ul>
+ *   <li><b>Cognito Integration</b> - User pool-based authentication and authorization</li>
+ *   <li><b>IAM Authorization</b> - Role-based access control with AWS credentials</li>
+ *   <li><b>API Key Management</b> - Usage plans and throttling controls</li>
+ *   <li><b>CORS Support</b> - Cross-origin resource sharing configuration</li>
+ * </ul>
+ * 
+ * <p><b>Monitoring & Observability:</b>
+ * <ul>
+ *   <li><b>CloudWatch Logs</b> - Dedicated log groups with custom retention</li>
+ *   <li><b>Access Logging</b> - Request/response logging with customizable formats</li>
+ *   <li><b>Execution Logging</b> - Method-level execution tracing and debugging</li>
+ *   <li><b>Metrics & Alarms</b> - Performance monitoring and alerting integration</li>
+ * </ul>
+ * 
+ * <p><b>Stage Management:</b>
+ * The construct supports multiple deployment stages with independent configuration:
+ * <ul>
+ *   <li>Per-stage logging and monitoring settings</li>
+ *   <li>Stage-specific throttling and caching policies</li>
+ *   <li>Environment-based variable injection</li>
+ *   <li>Blue/green deployment support</li>
+ * </ul>
+ * 
+ * <p><b>Advanced Configuration:</b>
+ * <ul>
+ *   <li>Template-based configuration with runtime value injection</li>
+ *   <li>Dynamic model creation from JSON schemas</li>
+ *   <li>Flexible authorizer assignment per method</li>
+ *   <li>Custom response codes and error handling</li>
+ * </ul>
+ * 
+ * <p><b>Usage Example:</b>
+ * <pre>{@code
+ * RestApiConstruct api = new RestApiConstruct(
+ *     this, common, apiConfig, authorizers);
+ *     
+ * // Automatically configures:
+ * // - REST API with validation and models
+ * // - CloudWatch logging and monitoring
+ * // - Cognito/IAM authorization
+ * // - Request/response schemas
+ * }</pre>
+ * 
+ * @author CDK Common Framework
+ * @since 1.0.0  
+ * @see RestApi for the underlying API Gateway resource
+ * @see Model for request/response schema definitions
+ * @see RequestValidator for input validation logic
+ * @see Authorizer for authentication integration
+ */
 @Slf4j
 @Getter
 public class RestApiConstruct extends Construct {
@@ -43,7 +118,7 @@ public class RestApiConstruct extends Construct {
   public RestApiConstruct(Construct scope, Common common, ApiConf conf, ApiRequestSchema schema) {
     super(scope, id("rest.api", common.id(), conf.name()));
 
-    log.debug("rest api configuration [common: {} api: {} schema: {}]", common, conf, schema);
+    log.debug("{} [common: {} conf: {}]", "RestApiConstruct", common, conf);
 
     this.logGroup = new LogGroupConstruct(this, common, conf.logGroup()).logGroup();
     this.api = getRestApi(conf, null);
@@ -55,7 +130,7 @@ public class RestApiConstruct extends Construct {
   public RestApiConstruct(Construct scope, Common common, ApiConf conf, Authorizer authorizer, ApiRequestSchema schema) {
     super(scope, id("rest.api", common.id(), conf.name()));
 
-    log.debug("rest api configuration with authorizer [common: {} api: {} schema: {}]", common, conf, schema);
+    log.debug("{} [common: {} conf: {}]", "RestApiConstruct", common, conf);
 
     this.logGroup = new LogGroupConstruct(this, common, conf.logGroup()).logGroup();
     this.api = getRestApi(conf, authorizer);

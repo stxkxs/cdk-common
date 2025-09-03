@@ -27,7 +27,7 @@ public class NamespaceConstruct extends Construct {
   public NamespaceConstruct(Construct scope, Common common, ObjectMeta metadata, ICluster cluster) {
     super(scope, id("namespace", metadata.getName()));
 
-    log.debug("configuration [common: {} metadata: {}]", common, metadata);
+    log.debug("{} [common: {}]", "NamespaceConstruct", common);
 
     var namespace = new NamespaceBuilder()
       .withNewMetadata()

@@ -33,6 +33,66 @@ import java.util.Objects;
 
 import static io.stxkxs.execute.serialization.Format.id;
 
+/**
+ * Comprehensive observability and monitoring construct that provides complete CloudWatch-based 
+ * monitoring, alerting, and visualization capabilities for AWS infrastructure and applications.
+ * 
+ * <p>This construct orchestrates multiple AWS services to create a unified observability platform:
+ * 
+ * <p><b>Core Capabilities:</b>
+ * <ul>
+ *   <li><b>Metric Collection</b> - Log-based metric filters for custom application metrics</li>
+ *   <li><b>Alerting</b> - CloudWatch alarms with configurable thresholds and conditions</li>
+ *   <li><b>Notifications</b> - SNS topics with email subscriptions for alert delivery</li>
+ *   <li><b>Dashboards</b> - CloudWatch dashboards for metric visualization and analysis</li>
+ * </ul>
+ * 
+ * <p><b>Advanced Features:</b>
+ * <ul>
+ *   <li>Dynamic metric filter creation from log patterns with custom namespaces</li>
+ *   <li>Configurable alarm conditions with multiple comparison operators and statistics</li>
+ *   <li>Multi-subscriber SNS topics with email distribution lists</li>
+ *   <li>Template-based dashboard configuration with JSON body processing</li>
+ *   <li>Comprehensive error handling with failed resource filtering</li>
+ *   <li>Automatic resource tagging with common and component-specific tags</li>
+ * </ul>
+ * 
+ * <p><b>Supported Configurations:</b>
+ * <ul>
+ *   <li><b>Metric Filters</b> - Extract metrics from CloudWatch Logs using literal patterns</li>
+ *   <li><b>Alarm Types</b> - Support for threshold, anomaly detection, and composite alarms</li>
+ *   <li><b>Notification Channels</b> - Email, SMS, and webhook integrations via SNS</li>
+ *   <li><b>Dashboard Widgets</b> - Metrics, logs, and custom visualization components</li>
+ * </ul>
+ * 
+ * <p><b>Error Resilience:</b>
+ * The construct implements robust error handling to ensure partial failures don't break 
+ * the entire observability setup. Failed alarms and dashboards are filtered out while 
+ * successful components remain operational.
+ * 
+ * <p><b>Template Processing:</b>
+ * All configurations support mustache template processing, allowing dynamic injection
+ * of values like account IDs, regions, and resource ARNs at deployment time.
+ * 
+ * <p><b>Usage Example:</b>
+ * <pre>{@code
+ * ObservabilityConstruct observability = new ObservabilityConstruct(
+ *     this, common, observabilityConfigJson);
+ *     
+ * // Automatically creates:
+ * // - MetricFilters from log patterns  
+ * // - CloudWatch Alarms with thresholds
+ * // - SNS Topics with email subscribers
+ * // - CloudWatch Dashboards with widgets
+ * }</pre>
+ * 
+ * @author CDK Common Framework
+ * @since 1.0.0
+ * @see MetricFilter for log-based metric extraction
+ * @see Alarm for threshold-based monitoring
+ * @see CfnDashboard for metric visualization
+ * @see Topic for notification delivery
+ */
 @Slf4j
 @Getter
 public class ObservabilityConstruct extends Construct {
@@ -48,6 +108,8 @@ public class ObservabilityConstruct extends Construct {
     var mapper = Mapper.get();
     var parsed = Template.parse(scope, conf);
     var observability = mapper.readValue(parsed, ObservabilityConf.class);
+
+    log.debug("{} [common: {} conf: {}]", "ObservabilityConstruct", common, observability);
 
     this.alarmTopics = createAlarmTopics(scope, observability.topics());
     this.metricFilters = createMetricFilters(scope, observability.metrics());

@@ -36,7 +36,7 @@ public class SqsConstruct extends Construct {
   public SqsConstruct(Construct scope, Common common, Sqs conf) {
     super(scope, id("sqs", conf.name()));
 
-    log.debug("sqs configuration [common: {} sqs: {}]", common, conf);
+    log.debug("{} [common: {} conf: {}]", "SqsConstruct", common, conf);
 
     this.sqs = SqsQueue.Builder
       .create(Queue.Builder
