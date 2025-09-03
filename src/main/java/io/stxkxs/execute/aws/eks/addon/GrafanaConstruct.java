@@ -12,10 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import software.amazon.awscdk.Duration;
 import software.amazon.awscdk.services.eks.HelmChart;
 import software.amazon.awscdk.services.eks.ICluster;
-import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
-import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueRequest;
 import software.constructs.Construct;
 
 import java.util.Map;
@@ -23,86 +19,94 @@ import java.util.Map;
 import static io.stxkxs.execute.serialization.Format.id;
 
 /**
- * Advanced Grafana Helm chart deployment construct with runtime secret management 
+ * Advanced Grafana Helm chart deployment construct with CDK context-based configuration
  * and secure credential injection for observability dashboards and monitoring.
- * 
+ *
  * <p>This construct represents one of the most complex add-on deployments, featuring:
- * 
+ *
  * <p><b>Core Capabilities:</b>
  * <ul>
  *   <li><b>Helm Chart Deployment</b> - Production-ready Grafana installation on EKS</li>
- *   <li><b>Runtime Secret Retrieval</b> - Direct AWS Secrets Manager API integration</li>
- *   <li><b>Template Processing</b> - Dynamic configuration injection with secret values</li>
- *   <li><b>Multi-Datasource Support</b> - Loki, Prometheus, Tempo integration</li>
+ *   <li><b>CDK Context Integration</b> - Direct configuration from cdk.context.json</li>
+ *   <li><b>Template Processing</b> - Dynamic configuration injection with context values</li>
+ *   <li><b>Multi-Datasource Support</b> - Loki, Prometheus, Tempo, Pyroscope integration</li>
  * </ul>
- * 
- * <p><b>Secret Management Integration:</b>
+ *
+ * <p><b>Configuration Management:</b>
  * <ul>
- *   <li><b>AWS Secrets Manager</b> - Secure retrieval of datasource credentials</li>
- *   <li><b>Multiple Lookup Methods</b> - Secret name and ARN-based resolution</li>
- *   <li><b>Runtime Injection</b> - Secrets injected into Helm values during deployment</li>
- *   <li><b>Error Handling</b> - Graceful degradation when secrets are unavailable</li>
+ *   <li><b>CDK Context</b> - Secure configuration from cdk.context.json</li>
+ *   <li><b>Build-time Injection</b> - Values injected into Helm chart during CDK synthesis</li>
+ *   <li><b>Error Handling</b> - Graceful degradation when context values are missing</li>
  * </ul>
- * 
+ *
  * <p><b>Supported Datasources:</b>
  * <ul>
  *   <li><b>Loki</b> - Log aggregation with host and username configuration</li>
  *   <li><b>Prometheus</b> - Metrics collection with authentication credentials</li>
  *   <li><b>Tempo</b> - Distributed tracing with secure endpoint access</li>
+ *   <li><b>Pyroscope</b> - Continuous profiling with host configuration</li>
+ *   <li><b>Fleet Management</b> - Grafana fleet management integration</li>
  *   <li><b>API Key</b> - Grafana service account authentication</li>
  * </ul>
- * 
+ *
  * <p><b>Security Features:</b>
  * <ul>
- *   <li>Credential isolation through AWS Secrets Manager</li>
- *   <li>Default AWS credentials provider integration</li>
- *   <li>Regional secret resolution with fallback ARN lookup</li>
- *   <li>Runtime credential injection without persistent storage</li>
+ *   <li>Credential configuration through CDK context</li>
+ *   <li>Build-time credential injection without runtime AWS API calls</li>
+ *   <li>No persistent storage of credentials in the cluster</li>
  * </ul>
- * 
- * <p><b>Error Handling Strategy:</b>
- * The construct implements a fail-safe approach where missing or inaccessible secrets
- * result in null chart creation rather than deployment failure, allowing the parent
- * construct to handle the degraded state gracefully.
- * 
+ *
  * <p><b>Template Processing Flow:</b>
  * <pre>
- * Secret Retrieval → Credential Extraction → Template Processing → Helm Deployment
+ * Context Reading → Configuration Creation → Template Processing → Helm Deployment
  *        ↓                    ↓                      ↓                   ↓
- * AWS API Call    →    JSON Parsing    →    Mustache    →    EKS Cluster
+ * CDK Context    →   GrafanaSecret   →    Mustache    →    EKS Cluster
  * </pre>
- * 
+ *
  * <p><b>Usage Example:</b>
  * <pre>{@code
  * GrafanaConstruct grafana = new GrafanaConstruct(
  *     this, common, grafanaConfig, cluster);
- *     
+ *
  * // Automatically handles:
- * // - Secret retrieval from AWS Secrets Manager
- * // - Template value injection with credentials  
+ * // - Configuration retrieval from CDK context
+ * // - Template value injection with credentials
  * // - Helm chart deployment with 15-minute timeout
  * // - Namespace and RBAC setup
  * }</pre>
- * 
+ *
  * @author CDK Common Framework
- * @since 1.0.0
  * @see HelmChart for Kubernetes deployment mechanism
- * @see SecretsManagerClient for AWS secret retrieval
  * @see GrafanaSecret for credential data structure
  * @see Template for mustache processing capabilities
+ * @since 1.0.0
  */
 @Slf4j
 @Getter
-public class GrafanaConstruct extends Construct {
+public class GrafanaConstruct extends GrafanaBaseConstruct {
   private final HelmChart chart;
 
+  /**
+   * Creates a new GrafanaConstruct with k8s-monitoring Helm chart deployment.
+   * 
+   * <p>This constructor validates Grafana Cloud context, processes the mustache template
+   * with context values, and deploys the k8s-monitoring Helm chart with proper configuration
+   * for metrics, logs, traces, and profiling integration with Grafana Cloud.
+   * 
+   * @param scope the CDK construct scope for this construct
+   * @param common common configuration values including cluster identification
+   * @param conf Grafana addon configuration including chart details and values template
+   * @param cluster the target EKS cluster for Helm chart deployment
+   * 
+   * @throws RuntimeException if template processing fails or chart deployment encounters errors
+   */
   @SneakyThrows
   public GrafanaConstruct(Construct scope, Common common, GrafanaAddon conf, ICluster cluster) {
     super(scope, id("grafana", conf.chart().release()));
 
     log.debug("{} [common: {} conf: {}]", "GrafanaConstruct", common, conf);
 
-    var secret = secret(common, conf.secret());
+    var secret = createSecretFromContext(scope);
     if (secret == null) {
       this.chart = null;
       return;
@@ -110,13 +114,15 @@ public class GrafanaConstruct extends Construct {
 
     var parsed = Template.parse(scope, conf.chart().values(),
       Map.ofEntries(
-        Map.entry("key", secret.key()),
-        Map.entry("lokiHost", secret.lokiHost()),
-        Map.entry("lokiUsername", secret.lokiUsername()),
-        Map.entry("prometheusHost", secret.prometheusHost()),
-        Map.entry("prometheusUsername", secret.prometheusUsername()),
-        Map.entry("tempoHost", secret.tempoHost()),
-        Map.entry("tempoUsername", secret.tempoUsername())));
+        Map.entry("hosted:eks:grafana:key", secret.key()),
+        Map.entry("hosted:eks:grafana:instanceId", secret.instanceId()),
+        Map.entry("hosted:eks:grafana:lokiHost", secret.lokiHost()),
+        Map.entry("hosted:eks:grafana:lokiUsername", secret.lokiUsername()),
+        Map.entry("hosted:eks:grafana:prometheusHost", secret.prometheusHost()),
+        Map.entry("hosted:eks:grafana:prometheusUsername", secret.prometheusUsername()),
+        Map.entry("hosted:eks:grafana:tempoHost", secret.tempoHost()),
+        Map.entry("hosted:eks:grafana:tempoUsername", secret.tempoUsername()),
+        Map.entry("hosted:eks:grafana:pyroscopeHost", secret.pyroscopeHost())));
 
     var values = Mapper.get().readValue(parsed, new TypeReference<Map<String, Object>>() {});
     this.chart = HelmChart.Builder
@@ -135,40 +141,4 @@ public class GrafanaConstruct extends Construct {
       .build();
   }
 
-  private static GrafanaSecret secret(Common common, String secret) {
-    if (secret == null || secret.isEmpty())
-      return null;
-
-    try (var client = SecretsManagerClient.builder()
-      .region(Region.of(common.region()))
-      .credentialsProvider(DefaultCredentialsProvider.create())
-      .build()) {
-
-      var secretValueResponse = get(client, secret);
-      if (secretValueResponse != null)
-        return secretValueResponse;
-
-      var arn = String.format("arn:aws:secretsmanager:%s:%s:secret:%s", common.region(), common.account(), secret);
-      return get(client, arn);
-    } catch (Exception e) {
-      throw new RuntimeException("failed to retrieve grafana secret " + e.getMessage(), e);
-    }
-  }
-
-  private static GrafanaSecret get(SecretsManagerClient client, String id) {
-    try {
-      var secret = client.getSecretValue(
-        GetSecretValueRequest.builder()
-          .secretId(id)
-          .build());
-
-      var value = secret.secretString();
-      if (value != null)
-        return Mapper.get().readValue(value, GrafanaSecret.class);
-
-      return null;
-    } catch (Exception e) {
-      return null;
-    }
-  }
 }

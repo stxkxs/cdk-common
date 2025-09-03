@@ -5,6 +5,7 @@ import io.stxkxs.execute.serialization.Template;
 import io.stxkxs.model._main.Common;
 import io.stxkxs.model.aws.eks.KubernetesConf;
 import io.stxkxs.model.aws.eks.addon.AddonsConf;
+import io.stxkxs.execute.aws.eks.addon.AlloyOperatorConstruct;
 import io.stxkxs.execute.aws.eks.addon.AwsLoadBalancerConstruct;
 import io.stxkxs.execute.aws.eks.addon.AwsSecretsStoreConstruct;
 import io.stxkxs.execute.aws.eks.addon.CertManagerConstruct;
@@ -22,6 +23,7 @@ import static io.stxkxs.execute.serialization.Format.id;
 @Slf4j
 @Getter
 public class AddonsConstruct extends Construct {
+  private final AlloyOperatorConstruct alloyOperator;
   private final GrafanaConstruct grafana;
   private final CertManagerConstruct certManager;
   private final CsiSecretsStoreConstruct csiSecretsStore;
@@ -37,7 +39,10 @@ public class AddonsConstruct extends Construct {
 
     var addons = Mapper.get().readValue(Template.parse(scope, conf.addons()), AddonsConf.class);
 
+    this.alloyOperator = new AlloyOperatorConstruct(this, common, addons.alloyOperator(), cluster);
+
     this.grafana = new GrafanaConstruct(this, common, addons.grafana(), cluster);
+    this.grafana().getNode().addDependency(this.alloyOperator());
 
     this.certManager = new CertManagerConstruct(this, common, addons.certManager(), cluster);
     this.certManager().getNode().addDependency(this.grafana());

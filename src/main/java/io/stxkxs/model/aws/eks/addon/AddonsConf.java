@@ -1,5 +1,6 @@
 package io.stxkxs.model.aws.eks.addon;
 
+import io.stxkxs.model.aws.eks.addon.core.AlloyOperatorAddon;
 import io.stxkxs.model.aws.eks.addon.core.AwsLoadBalancerAddon;
 import io.stxkxs.model.aws.eks.addon.core.CertManagerAddon;
 import io.stxkxs.model.aws.eks.addon.core.GrafanaAddon;
@@ -15,5 +16,6 @@ public record AddonsConf(
   AwsLoadBalancerAddon awsLoadBalancer,
   CertManagerAddon certManager,
   KarpenterAddon karpenter,
+  AlloyOperatorAddon alloyOperator,
   GrafanaAddon grafana
 ) {}

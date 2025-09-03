@@ -7,5 +7,7 @@ public record GrafanaSecret(
   String prometheusHost,
   String prometheusUsername,
   String tempoHost,
-  String tempoUsername
+  String tempoUsername,
+  String instanceId,
+  String pyroscopeHost
 ) {}

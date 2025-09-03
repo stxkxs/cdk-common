@@ -25,6 +25,7 @@ src/main/resources/
 │       │   ├── storage-class.yaml     # Static YAML
 │       │   └── tenancy.mustache       # Multi-tenancy
 │       ├── helm/
+│       │   ├── alloy-operator.mustache
 │       │   ├── aws-load-balancer.mustache
 │       │   ├── cert-manager.mustache
 │       │   ├── grafana.mustache
