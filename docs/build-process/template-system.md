@@ -11,11 +11,13 @@ src/main/resources/{environment}/{version}/{template-file}
 ```
 
 **Environments:**
+
 - `bootstrap` - Initial setup templates
-- `prototype` - Development/testing templates  
+- `prototype` - Development/testing templates
 - `production` - Production-ready templates
 
 **Versions:**
+
 - `v1`, `v2`, `v3` - API/template versions for backwards compatibility
 
 ### Template Loading Mechanism
@@ -28,6 +30,7 @@ var stream = Template.class.getClassLoader().getResourceAsStream(template);
 ```
 
 This allows templates to be:
+
 - Packaged in JARs
 - Loaded from classpath
 - Overridden by consumers
@@ -45,6 +48,7 @@ tags:
 ```
 
 **Variable Sources:**
+
 1. **Default Context** - Extracted from CDK context (Template.java:71-88)
 2. **Custom Variables** - Passed per-construct via mappings
 3. **Computed Values** - Generated during processing
@@ -52,6 +56,7 @@ tags:
 ### Template Organization Patterns
 
 **Service-Specific Templates:**
+
 ```
 eks/
 ├── addons.mustache       # EKS add-on configurations
@@ -60,6 +65,7 @@ eks/
 ```
 
 **Policy Templates:**
+
 ```
 policy/
 ├── karpenter.mustache           # Karpenter permissions
@@ -68,6 +74,7 @@ policy/
 ```
 
 **Nested Template References:**
+
 ```yaml
 # addons.mustache
 managed:
@@ -80,6 +87,7 @@ managed:
 ## Error Handling
 
 **Missing Template:**
+
 ```java
 if (stream == null) {
   var m = String.format("error parsing template! can not find %s.", template);
@@ -88,9 +96,11 @@ if (stream == null) {
 ```
 
 **Template Path Examples:**
+
 - Found: `prototype/v1/eks/addons.mustache`
 - Not Found: `production/v2/missing-template.mustache` → Exception
 
 ## Template Caching
 
-Templates are processed on-demand during construct creation. No explicit caching is implemented - relies on ClassLoader efficiency.
+Templates are processed on-demand during construct creation. No explicit caching is implemented - relies on ClassLoader
+efficiency.

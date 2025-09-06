@@ -25,15 +25,10 @@ public class UserPoolSesConstruct {
     log.debug("{} [common: {} conf: {}]", "UserPoolSesConstruct", common, conf);
 
     if (sesConf.enabled()) {
-      this.email = UserPoolEmail.withSES(
-        UserPoolSESOptions.builder()
-          .fromName(sesConf.sender().fromName())
-          .fromEmail(sesConf.sender().fromEmail())
-          .replyTo(sesConf.sender().replyTo())
-          .configurationSetName(sesConf.sender().configurationSetName())
-          .sesRegion(sesConf.sender().sesRegion())
-          .sesVerifiedDomain(sesConf.sender().sesVerifiedDomain())
-          .build());
+      this.email =
+        UserPoolEmail.withSES(UserPoolSESOptions.builder().fromName(sesConf.sender().fromName()).fromEmail(sesConf.sender().fromEmail())
+          .replyTo(sesConf.sender().replyTo()).configurationSetName(sesConf.sender().configurationSetName())
+          .sesRegion(sesConf.sender().sesRegion()).sesVerifiedDomain(sesConf.sender().sesVerifiedDomain()).build());
     } else {
       this.email = UserPoolEmail.withCognito();
     }

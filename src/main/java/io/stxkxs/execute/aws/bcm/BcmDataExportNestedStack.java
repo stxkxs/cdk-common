@@ -30,42 +30,22 @@ public class BcmDataExportNestedStack extends NestedStack {
 
     this.storage = new BucketConstruct(this, common, conf.bucket());
 
-    this.export = CfnExport.Builder
-      .create(this, conf.name())
-      .export(ExportProperty.builder()
-        .name(conf.name())
-        .description(conf.description())
-        .dataQuery(
-          DataQueryProperty.builder()
-            .queryStatement(conf.dataQuery().queryStatement())
-            .tableConfigurations(conf.dataQuery().tableConfigurations())
+    this.export = CfnExport.Builder.create(this, conf.name())
+      .export(ExportProperty.builder().name(conf.name()).description(conf.description())
+        .dataQuery(DataQueryProperty.builder().queryStatement(conf.dataQuery().queryStatement())
+          .tableConfigurations(conf.dataQuery().tableConfigurations()).build())
+        .destinationConfigurations(DestinationConfigurationsProperty.builder()
+          .s3Destination(S3DestinationProperty.builder().s3Region(conf.destinationConfigurations().region())
+            .s3Bucket(conf.destinationConfigurations().bucket()).s3Prefix(conf.destinationConfigurations().prefix())
+            .s3OutputConfigurations(S3OutputConfigurationsProperty.builder()
+              .compression(conf.destinationConfigurations().outputConfigurations().compression().toUpperCase())
+              .format(conf.destinationConfigurations().outputConfigurations().format().toUpperCase())
+              .outputType(conf.destinationConfigurations().outputConfigurations().outputType().toUpperCase())
+              .overwrite(conf.destinationConfigurations().outputConfigurations().overwrite().toUpperCase()).build())
             .build())
-        .destinationConfigurations(
-          DestinationConfigurationsProperty.builder()
-            .s3Destination(
-              S3DestinationProperty.builder()
-                .s3Region(conf.destinationConfigurations().region())
-                .s3Bucket(conf.destinationConfigurations().bucket())
-                .s3Prefix(conf.destinationConfigurations().prefix())
-                .s3OutputConfigurations(
-                  S3OutputConfigurationsProperty.builder()
-                    .compression(conf.destinationConfigurations().outputConfigurations().compression().toUpperCase())
-                    .format(conf.destinationConfigurations().outputConfigurations().format().toUpperCase())
-                    .outputType(conf.destinationConfigurations().outputConfigurations().outputType().toUpperCase())
-                    .overwrite(conf.destinationConfigurations().outputConfigurations().overwrite().toUpperCase())
-                    .build())
-                .build())
-            .build())
-        .refreshCadence(
-          RefreshCadenceProperty.builder()
-            .frequency(conf.refreshCadence().toUpperCase())
-            .build())
-        .build())
-      .tags(conf.tags().entrySet().stream()
-        .map(e -> ResourceTagProperty.builder()
-          .key(e.getKey())
-          .value(e.getValue())
-          .build()).toList())
+          .build())
+        .refreshCadence(RefreshCadenceProperty.builder().frequency(conf.refreshCadence().toUpperCase()).build()).build())
+      .tags(conf.tags().entrySet().stream().map(e -> ResourceTagProperty.builder().key(e.getKey()).value(e.getValue()).build()).toList())
       .build();
 
     this.export().getNode().addDependency(this.storage());

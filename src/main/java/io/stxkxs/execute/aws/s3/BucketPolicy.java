@@ -21,14 +21,9 @@ public class BucketPolicy {
     log.debug("s3 bucket policy configuration [bucket-policy: {}]", conf);
 
     var s = parse(scope, conf);
-    return PolicyStatement.Builder.create()
-      .sid(s.sid())
-      .effect(Effect.valueOf(s.effect().toUpperCase()))
-      .principals(conf.principals().stream().map(Principal::iamPrincipal).toList())
-      .actions(s.actions())
-      .resources(s.resources())
-      .conditions(s.conditions())
-      .build();
+    return PolicyStatement.Builder.create().sid(s.sid()).effect(Effect.valueOf(s.effect().toUpperCase()))
+      .principals(conf.principals().stream().map(Principal::iamPrincipal).toList()).actions(s.actions()).resources(s.resources())
+      .conditions(s.conditions()).build();
   }
 
   @SneakyThrows

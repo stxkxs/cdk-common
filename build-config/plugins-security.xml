@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- security plugins -->
+<plugins>
+    <plugin>
+        <groupId>org.owasp</groupId>
+        <artifactId>dependency-check-maven</artifactId>
+        <version>${dependency.check.maven.version}</version>
+        <configuration>
+            <failBuildOnCVSS>8</failBuildOnCVSS>
+            <suppressionFile>dependency-check-suppressions.xml</suppressionFile>
+            <format>ALL</format>
+            <outputDirectory>reports</outputDirectory>
+        </configuration>
+    </plugin>
+</plugins>

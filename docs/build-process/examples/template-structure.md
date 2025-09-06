@@ -3,6 +3,7 @@
 ## Directory Organization
 
 ### Complete Template Hierarchy
+
 ```
 src/main/resources/
 ├── prototype/
@@ -43,6 +44,7 @@ src/main/resources/
 ## Template Categories
 
 ### 1. Main Configuration Templates
+
 ```yaml
 # conf.mustache - Root configuration
 host:
@@ -63,6 +65,7 @@ deployment:
 ```
 
 ### 2. Service-Specific Templates
+
 ```yaml
 # eks/addons.mustache - EKS add-on configuration
 managed:
@@ -87,6 +90,7 @@ managed:
 ```
 
 ### 3. Policy Templates
+
 ```yaml
 # policy/karpenter.mustache - IAM policy for Karpenter
 - Effect: Allow
@@ -105,6 +109,7 @@ managed:
 ```
 
 ### 4. Helm Values Templates
+
 ```yaml
 # helm/karpenter.mustache - Karpenter Helm values
 clusterName: {{hosted:id}}-eks
@@ -122,6 +127,7 @@ nodeClassRef:
 ## Template Composition Patterns
 
 ### 1. Nested Template References
+
 ```yaml
 # Parent template references child templates
 addons: eks/addons.mustache
@@ -131,6 +137,7 @@ policies:
 ```
 
 ### 2. Conditional Content
+
 ```yaml
 # Using Mustache conditionals
 {{#eks.enabled}}
@@ -141,6 +148,7 @@ cluster:
 ```
 
 ### 3. Repeated Sections
+
 ```yaml
 # Iterating over collections
 {{#nodeGroups}}
@@ -155,6 +163,7 @@ cluster:
 ## Static vs Dynamic Templates
 
 ### Static Templates
+
 ```yaml
 # eks/storage-class.yaml - No Mustache processing
 apiVersion: storage.k8s.io/v1
@@ -168,6 +177,7 @@ parameters:
 ```
 
 ### Dynamic Templates
+
 ```yaml
 # eks/addons.mustache - Mustache processing
 apiVersion: storage.k8s.io/v1

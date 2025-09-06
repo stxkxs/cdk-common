@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- aws cdk and sdk dependencies -->
+<dependencies>
+    <!-- aws cdk core -->
+    <dependency>
+        <groupId>software.amazon.awscdk</groupId>
+        <artifactId>aws-cdk-lib</artifactId>
+        <version>${cdk.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>software.constructs</groupId>
+        <artifactId>constructs</artifactId>
+        <version>${constructs.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>software.amazon.awscdk</groupId>
+        <artifactId>cognito-identitypool-alpha</artifactId>
+        <version>${aws.cognito.identitypool.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>software.amazon.awscdk</groupId>
+        <artifactId>cdk-lambda-layer-kubectl-v33</artifactId>
+        <version>${cdk.kubectl.version}</version>
+    </dependency>
+
+    <!-- aws sdk -->
+    <dependency>
+        <groupId>software.amazon.awssdk</groupId>
+        <artifactId>sso</artifactId>
+        <version>${aws.sdk.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>software.amazon.awssdk</groupId>
+        <artifactId>ssooidc</artifactId>
+        <version>${aws.sdk.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>software.amazon.awssdk</groupId>
+        <artifactId>secretsmanager</artifactId>
+        <version>${aws.sdk.version}</version>
+    </dependency>
+</dependencies>

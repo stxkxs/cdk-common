@@ -5,6 +5,7 @@
 ### CDK Context Fundamentals
 
 #### Context Tree Structure
+
 ```java
 // CDK context flows through construct tree hierarchy
 App
@@ -16,12 +17,14 @@ App
 ```
 
 **Context Inheritance Rules:**
+
 1. **Hierarchical:** Child constructs inherit parent context
 2. **Additive:** Child context supplements parent context
 3. **Override:** Child values override parent values with same key
 4. **Immutable:** Context cannot be modified after set
 
 #### Context Storage Implementation
+
 ```java
 // CDK Node.java (conceptual)
 public class Node {
@@ -46,6 +49,7 @@ public class Node {
 #### Context Variable Categories
 
 **Host Variables (Physical Infrastructure):**
+
 ```java
 // Template.java:71-78 - Host context extraction
 Map.entry("host:id", scope.getNode().getContext("host:id").toString()),
@@ -59,6 +63,7 @@ Map.entry("host:version", scope.getNode().getContext("host:version").toString())
 ```
 
 **Hosted Variables (Logical Services):**
+
 ```java
 // Template.java:79-88 - Hosted context extraction  
 Map.entry("hosted:id", scope.getNode().getContext("hosted:id").toString()),
@@ -72,6 +77,7 @@ Map.entry("hosted:version", scope.getNode().getContext("hosted:version").toStrin
 ```
 
 **Computed Variables:**
+
 ```java
 // Template.java:58-66 - Computed context values
 var home = Optional.of(scope)
@@ -88,6 +94,7 @@ var synthesizer = Optional.of(scope)
 #### Context Variable Resolution Strategy
 
 **Required vs Optional Context:**
+
 ```java
 // Required - throws NPE if missing
 scope.getContext("host:id")
@@ -97,12 +104,14 @@ scope.tryGetContext("optional:value")
 ```
 
 **Type Handling:**
+
 ```java
 // All context values converted to strings for template processing
 .toString()
 ```
 
 **Error Handling:**
+
 ```java
 // NPE thrown for missing required context
 // Construct should fail fast during synthesis
@@ -111,6 +120,7 @@ scope.tryGetContext("optional:value")
 ### Context Sources and Precedence
 
 #### 1. cdk.context.json (Project Level)
+
 ```json
 {
   "host:environment": "prototype",
@@ -120,21 +130,25 @@ scope.tryGetContext("optional:value")
 ```
 
 **Characteristics:**
+
 - **Lowest Priority:** Overridden by other sources
 - **Version Controlled:** Committed to repository
 - **Team Defaults:** Shared across team members
 
 #### 2. CLI Arguments (Deployment Time)
+
 ```bash
 cdk deploy --context host:environment=production --context host:account=987654321098
 ```
 
 **Characteristics:**
+
 - **High Priority:** Overrides cdk.context.json
 - **Deployment Specific:** Different per deployment
 - **Runtime Flexibility:** Change without code modification
 
 #### 3. App Code Context (Application Level)
+
 ```java
 // Launch.java equivalent
 public static void main(String[] args) {
@@ -150,11 +164,13 @@ public static void main(String[] args) {
 ```
 
 **Characteristics:**
+
 - **Medium Priority:** Overrides file, overridden by CLI
 - **Code-Driven:** Managed in application code
 - **Dynamic:** Can be computed at runtime
 
 #### 4. Stack Context (Stack Level)
+
 ```java
 public class MyStack extends Stack {
   public MyStack(Scope scope, StackProps props) {
@@ -167,11 +183,13 @@ public class MyStack extends Stack {
 ```
 
 **Characteristics:**
+
 - **Stack Scoped:** Only available to constructs in this stack
 - **Override Capability:** Can override app-level context
 - **Construct Specific:** Tailored to stack needs
 
 #### 5. Custom Context (Construct Level)
+
 ```java
 // Launch.java:49-52 - Custom context per template
 Template.parse(app, "conf.mustache",
@@ -182,6 +200,7 @@ Template.parse(app, "conf.mustache",
 ```
 
 **Characteristics:**
+
 - **Highest Priority:** Overrides all other context
 - **Template Specific:** Only for specific template processing
 - **Dynamic Values:** Can be computed at synthesis time
@@ -189,18 +208,21 @@ Template.parse(app, "conf.mustache",
 ### Context Resolution Algorithm
 
 #### Variable Lookup Process
+
 ```java
 // Template.java:33 - Variable merging
 Maps.from(defaults(scope), values)
 ```
 
 **Resolution Order:**
+
 1. **Custom Variables** (highest priority)
-2. **Default Context Variables** 
+2. **Default Context Variables**
 3. **CDK Context Hierarchy** (app → stack → construct)
 4. **cdk.context.json** (lowest priority)
 
 #### Variable Merging Implementation
+
 ```java
 // Common.Maps.from conceptual implementation
 public static Map<String, Object> from(Map<String, Object> defaults, Map<String, Object> overrides) {
@@ -213,6 +235,7 @@ public static Map<String, Object> from(Map<String, Object> defaults, Map<String,
 ### Context Performance Characteristics
 
 #### Context Access Performance
+
 ```java
 // Context lookup complexity: O(depth) where depth = construct tree depth
 // Typical depth: 3-5 levels (App → Stack → Construct → SubConstruct)
@@ -220,12 +243,14 @@ public static Map<String, Object> from(Map<String, Object> defaults, Map<String,
 ```
 
 #### Memory Usage
+
 - **Context Storage:** HashMap per construct node
 - **String Values:** All context values stored as objects
 - **Tree References:** Parent/child references maintained
 - **Garbage Collection:** Context cleaned up with construct tree
 
 #### Optimization Strategies
+
 1. **Context Caching:** Cache frequently accessed values
 2. **Batch Extraction:** Extract all needed context at once
 3. **Type Conversion:** Convert types once, reuse
@@ -234,6 +259,7 @@ public static Map<String, Object> from(Map<String, Object> defaults, Map<String,
 ### Advanced Context Patterns
 
 #### Environment-Specific Context
+
 ```json
 // Different context files per environment
 // cdk.context.prototype.json
@@ -250,6 +276,7 @@ public static Map<String, Object> from(Map<String, Object> defaults, Map<String,
 ```
 
 #### Context Validation
+
 ```java
 // Add validation in constructs
 public class ValidatedConstruct extends Construct {
@@ -269,6 +296,7 @@ public class ValidatedConstruct extends Construct {
 ```
 
 #### Dynamic Context Generation
+
 ```java
 // Launch.java:57-75 - Runtime context computation
 private static ArrayList<Map<String, String>> tags(App app) {
@@ -297,6 +325,7 @@ private static ArrayList<Map<String, String>> tags(App app) {
 ### Debugging Context Issues
 
 #### Context Inspection
+
 ```java
 // Debug all available context
 public void debugContext(Construct scope) {
@@ -307,6 +336,7 @@ public void debugContext(Construct scope) {
 ```
 
 #### Context Tracing
+
 ```java
 // Trace context resolution
 public Object traceGetContext(Construct scope, String key) {
@@ -325,6 +355,7 @@ public Object traceGetContext(Construct scope, String key) {
 ```
 
 #### Context Validation Tools
+
 ```java
 // Validate required context exists
 public static void validateRequiredContext(Construct scope, String... requiredKeys) {

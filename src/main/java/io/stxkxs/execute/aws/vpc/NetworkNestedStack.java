@@ -1,5 +1,9 @@
 package io.stxkxs.execute.aws.vpc;
 
+import static io.stxkxs.execute.serialization.Format.describe;
+import static io.stxkxs.execute.serialization.Format.exported;
+import static io.stxkxs.execute.serialization.Format.id;
+
 import io.stxkxs.model._main.Common;
 import io.stxkxs.model.aws.vpc.NetworkConf;
 import lombok.Getter;
@@ -9,8 +13,6 @@ import software.amazon.awscdk.NestedStack;
 import software.amazon.awscdk.NestedStackProps;
 import software.amazon.awscdk.services.ec2.Vpc;
 import software.constructs.Construct;
-
-import static io.stxkxs.execute.serialization.Format.*;
 
 @Slf4j
 @Getter
@@ -24,11 +26,7 @@ public class NetworkNestedStack extends NestedStack {
 
     this.vpc = new VpcConstruct(this, common, conf).vpc();
 
-    CfnOutput.Builder
-      .create(this, id(common.id(), "vpc.id"))
-      .exportName(exported(scope, "vpcid"))
-      .value(this.vpc().getVpcId())
-      .description(describe(common))
-      .build();
+    CfnOutput.Builder.create(this, id(common.id(), "vpc.id")).exportName(exported(scope, "vpcid")).value(this.vpc().getVpcId())
+      .description(describe(common)).build();
   }
 }

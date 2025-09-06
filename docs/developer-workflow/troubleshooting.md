@@ -5,7 +5,9 @@
 ### Template Resolution Issues
 
 #### Template Not Found
+
 **Error:**
+
 ```
 error parsing template! can not find prototype/v1/eks/addons.mustache.
 ```
@@ -37,6 +39,7 @@ error parsing template! can not find prototype/v1/eks/addons.mustache.
    ```
 
 #### Template Path Debugging
+
 ```java
 // Add debugging to see resolved paths
 System.out.println("Environment: " + scope.getNode().getContext("host:environment"));
@@ -47,7 +50,9 @@ System.out.println("Template: " + templateFile);
 ### Context Variable Issues
 
 #### Missing Context Variables
+
 **Error:**
+
 ```
 java.lang.NullPointerException: Cannot invoke "toString()" because 
 the return value of "software.constructs.Node.getContext(String)" is null
@@ -80,7 +85,9 @@ the return value of "software.constructs.Node.getContext(String)" is null
    ```
 
 #### Context Variable Naming
+
 **Common Mistakes:**
+
 ```json
 // Wrong - inconsistent naming
 {
@@ -98,7 +105,9 @@ the return value of "software.constructs.Node.getContext(String)" is null
 ### Template Processing Issues
 
 #### Mustache Syntax Errors
+
 **Error:**
+
 ```
 com.github.mustachejava.MustacheException: 
   Unknown tag: hosted:id at line 5
@@ -123,9 +132,11 @@ com.github.mustachejava.MustacheException:
    ```
 
 #### Variable Not Substituted
+
 **Symptom:** Template variables remain as `{{variable}}` in output
 
 **Causes:**
+
 1. **Variable not in context**
    ```java
    // Add missing variable to context
@@ -143,7 +154,9 @@ com.github.mustachejava.MustacheException:
 ### YAML Parsing Issues
 
 #### Invalid YAML Structure
+
 **Error:**
+
 ```
 com.fasterxml.jackson.dataformat.yaml.snakeyaml.error.YAMLException:
   mapping values are not allowed here
@@ -171,7 +184,9 @@ com.fasterxml.jackson.dataformat.yaml.snakeyaml.error.YAMLException:
    ```
 
 #### Unrecognized Properties
+
 **Error:**
+
 ```
 com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException:
   Unrecognized field "invalidField" (class io.stxkxs.model.RdsConf)
@@ -200,7 +215,9 @@ com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException:
 ### Build and Deployment Issues
 
 #### CDK Synthesis Fails
+
 **Error:**
+
 ```
 Error: spawn java ENOENT
 ```
@@ -226,7 +243,9 @@ Error: spawn java ENOENT
    ```
 
 #### Resource Name Conflicts
+
 **Error:**
+
 ```
 Resource with id 'bucket' already exists
 ```
@@ -249,12 +268,14 @@ Resource with id 'bucket' already exists
 ## Debugging Strategies
 
 ### 1. Enable Debug Logging
+
 ```bash
 export CDK_DEBUG=true
 cdk synth
 ```
 
 ### 2. Print Template Processing
+
 ```java
 // Add temporary debug output
 var processed = Template.parse(scope, "template.mustache");
@@ -263,6 +284,7 @@ var config = Mapper.get().readValue(processed, ConfigClass.class);
 ```
 
 ### 3. Validate Templates Independently
+
 ```java
 // Test template processing without CDK
 public static void main(String[] args) {
@@ -274,6 +296,7 @@ public static void main(String[] args) {
 ```
 
 ### 4. Check Generated CloudFormation
+
 ```bash
 # Examine CDK output
 cat cdk.out/MyStack.template.json | jq '.Resources'
@@ -282,12 +305,14 @@ cat cdk.out/MyStack.template.json | jq '.Resources'
 ## Getting Help
 
 ### 1. Check Template Resolution
+
 ```java
 // Template.java:38 - Enable debug logging to see:
 // "parsing template prototype/v1/eks/addons.mustache with parameters {host:id=myapp, ...}"
 ```
 
 ### 2. Validate Context Variables
+
 ```java
 // Print all available context
 scope.getNode().getAllContext().forEach((k, v) -> 
@@ -295,9 +320,11 @@ scope.getNode().getAllContext().forEach((k, v) ->
 ```
 
 ### 3. Test Template Syntax
+
 Use online Mustache testers with your template content and variables.
 
 ### 4. Maven Dependency Issues
+
 ```bash
 # Check for conflicting versions
 mvn dependency:tree | grep -E "(jackson|mustache|aws-cdk)"

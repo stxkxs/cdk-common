@@ -6,27 +6,29 @@ import software.constructs.Construct;
 
 /**
  * Base class for Grafana-related constructs that require Grafana Cloud context validation.
- * 
- * <p>This base class provides shared functionality for constructs that depend on
- * Grafana Cloud configuration being present in the CDK context. It handles:
- * 
+ *
+ * <p>
+ * This base class provides shared functionality for constructs that depend on Grafana Cloud configuration being present in the CDK context.
+ * It handles:
+ *
  * <ul>
- *   <li><b>Context Validation</b> - Validates all required Grafana context values are present</li>
- *   <li><b>Secret Creation</b> - Creates GrafanaSecret from validated context values</li>
- *   <li><b>Graceful Degradation</b> - Allows constructs to fail gracefully when context is missing</li>
+ * <li><b>Context Validation</b> - Validates all required Grafana context values are present</li>
+ * <li><b>Secret Creation</b> - Creates GrafanaSecret from validated context values</li>
+ * <li><b>Graceful Degradation</b> - Allows constructs to fail gracefully when context is missing</li>
  * </ul>
- * 
- * <p><b>Required Context Keys:</b>
+ *
+ * <p>
+ * <b>Required Context Keys:</b>
  * <ul>
- *   <li>hosted:eks:grafana:key</li>
- *   <li>hosted:eks:grafana:instanceId</li>
- *   <li>hosted:eks:grafana:lokiHost</li>
- *   <li>hosted:eks:grafana:lokiUsername</li>
- *   <li>hosted:eks:grafana:prometheusHost</li>
- *   <li>hosted:eks:grafana:prometheusUsername</li>
- *   <li>hosted:eks:grafana:tempoHost</li>
- *   <li>hosted:eks:grafana:tempoUsername</li>
- *   <li>hosted:eks:grafana:pyroscopeHost</li>
+ * <li>hosted:eks:grafana:key</li>
+ * <li>hosted:eks:grafana:instanceId</li>
+ * <li>hosted:eks:grafana:lokiHost</li>
+ * <li>hosted:eks:grafana:lokiUsername</li>
+ * <li>hosted:eks:grafana:prometheusHost</li>
+ * <li>hosted:eks:grafana:prometheusUsername</li>
+ * <li>hosted:eks:grafana:tempoHost</li>
+ * <li>hosted:eks:grafana:tempoUsername</li>
+ * <li>hosted:eks:grafana:pyroscopeHost</li>
  * </ul>
  */
 @Slf4j
@@ -37,8 +39,7 @@ public abstract class GrafanaBaseConstruct extends Construct {
   }
 
   /**
-   * Creates a GrafanaSecret from CDK context values.
-   * Returns null if any required context values are missing.
+   * Creates a GrafanaSecret from CDK context values. Returns null if any required context values are missing.
    */
   protected static GrafanaSecret createSecretFromContext(Construct scope) {
     try {
@@ -52,24 +53,14 @@ public abstract class GrafanaBaseConstruct extends Construct {
       var tempoUsername = getContextValue(scope, "hosted:eks:grafana:tempoUsername");
       var pyroscopeHost = getContextValue(scope, "hosted:eks:grafana:pyroscopeHost");
 
-      if (key == null || instanceId == null || lokiHost == null || lokiUsername == null ||
-          prometheusHost == null || prometheusUsername == null || tempoHost == null ||
-          tempoUsername == null || pyroscopeHost == null) {
+      if (key == null || instanceId == null || lokiHost == null || lokiUsername == null || prometheusHost == null
+        || prometheusUsername == null || tempoHost == null || tempoUsername == null || pyroscopeHost == null) {
         log.warn("missing required grafana context values, skipping grafana-related deployments");
         return null;
       }
 
-      return new GrafanaSecret(
-        key,
-        lokiHost,
-        lokiUsername,
-        prometheusHost,
-        prometheusUsername,
-        tempoHost,
-        tempoUsername,
-        instanceId,
-        pyroscopeHost
-      );
+      return new GrafanaSecret(key, lokiHost, lokiUsername, prometheusHost, prometheusUsername, tempoHost, tempoUsername, instanceId,
+        pyroscopeHost);
     } catch (Exception e) {
       log.error("failed to create grafana secret from context: {}", e.getMessage(), e);
       return null;
