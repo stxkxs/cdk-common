@@ -1,6 +1,6 @@
 package io.stxkxs.model.aws.codebuild;
 
-public record Variable(
-  String name,
-  String defaults
-) {}
+/**
+ * Variable configuration for pipelines.
+ */
+public record Variable(String name, String defaults) {}

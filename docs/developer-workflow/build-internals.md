@@ -2,18 +2,21 @@
 
 ## Overview
 
-This document explains the internal processes that occur when you run `cdk synth` or `cdk deploy` with projects using the cdk-common library.
+This document explains the internal processes that occur when you run `cdk synth` or `cdk deploy` with projects using
+the cdk-common library.
 
 ## CDK Synthesis Flow
 
 ### 1. CDK App Initialization
+
 ```bash
 cdk synth
 ```
 
 **What Happens:**
+
 1. CDK reads `cdk.json` configuration
-2. CDK loads context from `cdk.context.json` 
+2. CDK loads context from `cdk.context.json`
 3. CDK instantiates your `App` class
 4. Context variables become available to constructs
 
@@ -35,6 +38,7 @@ return execute(environment, version, file, defaults(scope));
 ```
 
 **Template Path Construction:**
+
 ```java
 // Template.java:42-43  
 var prefix = String.format("%s/%s", environment, version);  // "prototype/v1"
@@ -42,6 +46,7 @@ var template = String.format("%s/%s", prefix, file);        // "prototype/v1/con
 ```
 
 **ClassLoader Resolution:**
+
 ```java
 // Template.java:45
 var stream = Template.class.getClassLoader().getResourceAsStream(template);
@@ -51,6 +56,7 @@ var stream = Template.class.getClassLoader().getResourceAsStream(template);
 ### 3. Context Variable Extraction
 
 **Default Variables:** (Template.java:71-88)
+
 ```java
 Map.ofEntries(
   Map.entry("host:id", scope.getNode().getContext("host:id").toString()),           // "myapp"
@@ -61,6 +67,7 @@ Map.ofEntries(
 ```
 
 **Runtime Context:**
+
 ```java
 // Template.java:58-66
 var home = Optional.of(scope)
@@ -72,6 +79,7 @@ var home = Optional.of(scope)
 ### 4. Mustache Template Processing
 
 **Template Compilation:**
+
 ```java
 // Template.java:98-100
 var factory = new DefaultMustacheFactory();
@@ -81,6 +89,7 @@ factory.compile(new InputStreamReader(stream, StandardCharsets.UTF_8), template)
 ```
 
 **Variable Substitution Example:**
+
 ```yaml
 # Input template
 name: {{hosted:id}}-bucket
@@ -95,12 +104,14 @@ region: us-east-1
 ### 5. YAML → POJO Deserialization
 
 **Jackson Processing:**
+
 ```java
 // Various constructs use this pattern
 var config = Mapper.get().readValue(Template.parse(scope, "conf.mustache"), ConfigClass.class);
 ```
 
 **Jackson Configuration:** (Mapper.java:25-43)
+
 ```java
 JsonMapper.builder(yamlConf())
   .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)      // Case-insensitive enums
@@ -115,12 +126,14 @@ JsonMapper.builder(yamlConf())
 ### 6. Construct Creation
 
 **Construct Instantiation:**
+
 ```java
 // Your stack code
 var database = new RdsConstruct(this, common, databaseConfig);
 ```
 
 **Internal Processing:**
+
 1. Construct receives processed POJO configuration
 2. Creates AWS CDK resources based on configuration
 3. Applies tags, naming conventions from template variables
@@ -129,6 +142,7 @@ var database = new RdsConstruct(this, common, databaseConfig);
 ### 7. CloudFormation Generation
 
 **CDK Synthesis:**
+
 1. All constructs contribute resources to CDK tree
 2. CDK synthesizes CloudFormation templates
 3. Templates written to `cdk.out/` directory
@@ -137,16 +151,19 @@ var database = new RdsConstruct(this, common, databaseConfig);
 ## Performance Characteristics
 
 ### Template Caching
+
 - **No explicit caching** - templates processed on each construct creation
 - **ClassLoader efficiency** - repeated resource access is optimized by JVM
 - **Template compilation** - Mustache compiles templates but doesn't cache them
 
 ### Memory Usage
+
 - **Template content** - Loaded into memory during processing
 - **Context variables** - Shared across all constructs in scope tree
 - **POJO objects** - Created per construct, garbage collected after use
 
 ### Build Time Impact
+
 ```
 Template Processing Time:
 ├── File I/O: ~1-5ms per template
@@ -156,6 +173,7 @@ Template Processing Time:
 ```
 
 **Optimization Strategies:**
+
 - Keep templates small and focused
 - Minimize nested template references
 - Use efficient POJO structures
@@ -163,6 +181,7 @@ Template Processing Time:
 ## Error Handling During Build
 
 ### Template Not Found
+
 ```java
 // Template.java:46-49
 if (stream == null) {
@@ -172,11 +191,13 @@ if (stream == null) {
 ```
 
 **Error Message Example:**
+
 ```
 error parsing template! can not find prototype/v1/missing-template.mustache.
 ```
 
 ### Context Variable Missing
+
 ```java
 // When getContext() called on missing variable
 Exception in thread "main" java.lang.NullPointerException: 
@@ -185,12 +206,14 @@ Exception in thread "main" java.lang.NullPointerException:
 ```
 
 ### YAML Parsing Errors
+
 ```
 com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException:
   Unrecognized field "invalidField" (class io.stxkxs.model.RdsConf)
 ```
 
 ### Mustache Processing Errors
+
 ```
 com.github.mustachejava.MustacheException: 
   Template 'prototype/v1/conf.mustache' not found
@@ -199,12 +222,14 @@ com.github.mustachejava.MustacheException:
 ## Debug Information
 
 ### Enable Debug Logging
+
 ```bash
 export CDK_DEBUG=true
 cdk synth
 ```
 
 ### Template Processing Logs
+
 ```java
 // Template.java:38,91 - Debug output
 log.debug("parsing template {}/{}/{} with parameters {}", environment, version, file, values);
@@ -212,6 +237,7 @@ log.debug("default template variables [defaults: {}]", defaults);
 ```
 
 ### Inspect Generated CloudFormation
+
 ```bash
 # View generated templates
 cat cdk.out/MyStack.template.json

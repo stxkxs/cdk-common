@@ -2,7 +2,8 @@
 
 ## Overview
 
-This document explains what happens when AWS CDK builds projects using the cdk-common library. The build process follows a specific flow: **CDK Context → Template Resolution → Mustache Processing → POJO Mapping**.
+This document explains what happens when AWS CDK builds projects using the cdk-common library. The build process follows
+a specific flow: **CDK Context → Template Resolution → Mustache Processing → POJO Mapping**.
 
 ## Build Flow
 
@@ -17,6 +18,7 @@ var environment = Environment.of(scope.getNode().getContext("host:environment"))
 ```
 
 **Key Context Variables:**
+
 - `host:*` - Host environment details (account, region, domain)
 - `hosted:*` - Hosted service details (organization, name, alias)
 - `home` - Base path for templates
@@ -33,6 +35,7 @@ var template = String.format("%s/%s", prefix, file);
 ```
 
 **Path Structure:**
+
 ```
 src/main/resources/
 ├── {environment}/          # e.g., "prototype", "production"
@@ -81,6 +84,7 @@ var addons = Mapper.get().readValue(Template.parse(scope, conf.addons()), Addons
 ```
 
 **Jackson Configuration:**
+
 - Case-insensitive property matching
 - Custom accessor naming (no prefixes)
 - Non-null serialization
@@ -89,6 +93,7 @@ var addons = Mapper.get().readValue(Template.parse(scope, conf.addons()), Addons
 ## Example Flow
 
 **Input Context:**
+
 ```json
 {
   "host:environment": "prototype",
@@ -101,6 +106,7 @@ var addons = Mapper.get().readValue(Template.parse(scope, conf.addons()), Addons
 **Template Path:** `prototype/v1/eks/addons.mustache`
 
 **Template Content:**
+
 ```yaml
 managed:
   awsVpcCni:
@@ -111,6 +117,7 @@ managed:
 ```
 
 **After Processing:**
+
 ```yaml
 managed:
   awsVpcCni:
@@ -125,6 +132,6 @@ managed:
 ## Key Files
 
 - `Template.java:23` - Main template parsing entry point
-- `Template.java:71-88` - Default context variable extraction  
+- `Template.java:71-88` - Default context variable extraction
 - `Mapper.java:25-43` - Jackson YAML configuration
 - Consumer `Launch.java:49` - Template parsing with custom variables

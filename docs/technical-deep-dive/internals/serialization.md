@@ -5,6 +5,7 @@
 ### Mapper.java - Central Configuration
 
 #### ObjectMapper Setup
+
 ```java
 // Mapper.java:21,25-43 - Singleton ObjectMapper configuration
 private static final ObjectMapper mapper = configure();
@@ -31,6 +32,7 @@ private static ObjectMapper configure() {
 ```
 
 #### YAML Factory Configuration
+
 ```java
 // Mapper.java:46-50 - YAML-specific settings
 private static YAMLFactory yamlConf() {
@@ -43,17 +45,20 @@ private static YAMLFactory yamlConf() {
 ### Configuration Analysis
 
 #### Case Insensitive Processing
+
 ```java
 .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
 .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
 ```
 
 **Benefits:**
+
 - **Flexible YAML:** `instanceType` matches `instancetype` or `INSTANCETYPE`
 - **Enum Mapping:** `PRODUCTION` matches `production` or `Production`
 - **Human Friendly:** Less strict formatting requirements
 
 **Examples:**
+
 ```yaml
 # All these map to the same Java field
 instanceType: t3.micro
@@ -67,11 +72,13 @@ environment: PRODUCTION
 ```
 
 #### Null Handling Strategy
+
 ```java
 .serializationInclusion(Include.NON_NULL)
 ```
 
 **Serialization:** Null fields omitted from output YAML
+
 ```java
 // Java object with null field
 public class Config {
@@ -85,6 +92,7 @@ name: test
 ```
 
 #### Collection Null Handling
+
 ```java
 .withConfigOverride(LinkedHashMap.class, (handler) -> handler.setSetterInfo(Value.forValueNulls(Nulls.AS_EMPTY)))
 .withConfigOverride(TreeSet.class, (handler) -> handler.setSetterInfo(Value.forValueNulls(Nulls.AS_EMPTY)))
@@ -93,6 +101,7 @@ name: test
 ```
 
 **Behavior:** Null collections become empty collections
+
 ```yaml
 # YAML with null/missing collections
 config:
@@ -107,6 +116,7 @@ Config {
 ```
 
 #### Accessor Naming Strategy
+
 ```java
 .accessorNaming(
   new Provider()
@@ -116,6 +126,7 @@ Config {
 ```
 
 **Impact on Method Naming:**
+
 ```java
 // Traditional Java Bean
 public class TraditionalBean {
@@ -147,11 +158,13 @@ public class CommonBean {
 ### DefaultMixin Integration
 
 #### Mixin Purpose
+
 ```java
 .addMixIn(Object.class, DefaultMixin.class)
 ```
 
 **DefaultMixin.java Analysis:**
+
 ```java
 // Expected structure based on usage
 public interface DefaultMixin {
@@ -167,16 +180,19 @@ public interface DefaultMixin {
 ### JDK8 Module Integration
 
 #### JDK8Module Features
+
 ```java
 .addModule(new Jdk8Module())
 ```
 
 **Capabilities:**
+
 - **Optional Support:** `Optional<String>` serialization/deserialization
 - **Time API:** `LocalDateTime`, `ZonedDateTime` support
 - **Stream API:** Basic stream serialization
 
 **Usage Examples:**
+
 ```java
 public class ModernConfig {
   private Optional<String> description;      // Serializes as value or null
@@ -188,6 +204,7 @@ public class ModernConfig {
 ### Serialization Process Flow
 
 #### Template → YAML → POJO Pipeline
+
 ```java
 // 1. Template processing produces YAML string
 var yamlString = Template.parse(scope, "config.mustache");
@@ -199,6 +216,7 @@ var config = Mapper.get().readValue(yamlString, ConfigClass.class);
 #### Detailed Processing Steps
 
 **Step 1: YAML Parsing**
+
 ```java
 // YAMLFactory creates YAML parser
 // Handles YAML-specific syntax: lists, maps, scalars
@@ -206,6 +224,7 @@ var config = Mapper.get().readValue(yamlString, ConfigClass.class);
 ```
 
 **Step 2: Property Resolution**
+
 ```java
 // Case-insensitive property matching
 // "instanceType" YAML property → instanceType() Java method
@@ -213,6 +232,7 @@ var config = Mapper.get().readValue(yamlString, ConfigClass.class);
 ```
 
 **Step 3: Type Conversion**
+
 ```java  
 // String → Enum conversion (case-insensitive)
 // String → Primitive conversion  
@@ -221,6 +241,7 @@ var config = Mapper.get().readValue(yamlString, ConfigClass.class);
 ```
 
 **Step 4: Object Construction**
+
 ```java
 // Default constructor called
 // Setter methods invoked (or field injection)
@@ -230,17 +251,20 @@ var config = Mapper.get().readValue(yamlString, ConfigClass.class);
 ### Performance Characteristics
 
 #### ObjectMapper Singleton Pattern
+
 ```java
 // Mapper.java:21 - Single instance for entire application
 private static final ObjectMapper mapper = configure();
 ```
 
 **Benefits:**
+
 - **Configuration Reuse:** Setup cost paid once
 - **Thread Safety:** Jackson ObjectMapper is thread-safe
 - **Memory Efficiency:** Single instance across all serialization
 
 **Performance Metrics:**
+
 - **Initialization:** ~10-50ms for complex configuration
 - **Per-Operation:** ~1-10ms for typical POJO serialization
 - **Memory:** ~1-5MB for ObjectMapper instance + caches
@@ -248,11 +272,13 @@ private static final ObjectMapper mapper = configure();
 #### Optimization Strategies
 
 **Jackson Internal Caching:**
+
 - **Property Introspection:** Cached per class
 - **Serializer Selection:** Cached per type
 - **Deserializer Selection:** Cached per type
 
 **Performance Considerations:**
+
 ```java
 // Expensive - creates new ObjectMapper each time
 ObjectMapper mapper = new ObjectMapper();  // DON'T DO THIS
@@ -266,23 +292,27 @@ Mapper.get().readValue(yaml, ConfigClass.class);  // DO THIS
 #### Common Serialization Errors
 
 **Unrecognized Property:**
+
 ```java
 com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException:
   Unrecognized field "unknownField" (class io.stxkxs.model.ConfigClass)
 ```
 
 **Solutions:**
+
 1. **Add Field:** Add missing field to Java class
 2. **Ignore Unknown:** Use `@JsonIgnoreProperties(ignoreUnknown = true)`
 3. **Remove Property:** Remove from YAML template
 
 **Type Mismatch:**
+
 ```java
 com.fasterxml.jackson.databind.exc.InvalidFormatException:
   Cannot deserialize value of type `int` from String "not-a-number"
 ```
 
 **Solutions:**
+
 1. **Fix YAML:** Correct value type in template
 2. **Custom Deserializer:** Handle string → number conversion
 3. **Validation:** Add input validation
@@ -290,6 +320,7 @@ com.fasterxml.jackson.databind.exc.InvalidFormatException:
 #### Debugging Serialization
 
 **Enable Jackson Debugging:**
+
 ```java
 // Temporary debugging configuration
 ObjectMapper debugMapper = Mapper.get().copy()
@@ -298,6 +329,7 @@ ObjectMapper debugMapper = Mapper.get().copy()
 ```
 
 **Trace YAML Processing:**
+
 ```java
 // Log processed YAML before deserialization
 var yamlString = Template.parse(scope, "config.mustache");
@@ -310,6 +342,7 @@ System.out.println("Parsed Config: " + config);
 ### Advanced Serialization Patterns
 
 #### Custom Serializers
+
 ```java
 // Example custom serializer for special types
 public class CustomConfigSerializer extends JsonSerializer<CustomConfig> {
@@ -324,6 +357,7 @@ mapper.addSerializer(CustomConfig.class, new CustomConfigSerializer());
 ```
 
 #### Conditional Serialization
+
 ```java
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class ConditionalConfig {
@@ -335,6 +369,7 @@ public class ConditionalConfig {
 ```
 
 #### Polymorphic Deserialization
+
 ```java
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
@@ -349,6 +384,7 @@ public abstract class StorageConfig {
 ### Integration with CDK Constructs
 
 #### Typical Usage Pattern
+
 ```java
 // EksNestedStack.java:59,64 - Common pattern
 var sqs = Mapper.get().readValue(Template.parse(this, conf.sqs()), Sqs.class);
@@ -356,11 +392,13 @@ var configuration = Mapper.get().readValue(Template.parse(this, conf.nodeGroups(
 ```
 
 **Flow:**
+
 1. **Template Processing:** Mustache → YAML string
 2. **Deserialization:** YAML string → Typed Java object
 3. **Construct Usage:** Java object configures AWS resources
 
 #### Type Safety Benefits
+
 ```java
 // Strongly typed configuration
 public class DatabaseConfig {

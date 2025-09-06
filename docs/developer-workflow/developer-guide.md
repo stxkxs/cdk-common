@@ -2,11 +2,13 @@
 
 ## Getting Started
 
-This guide explains how developers use the cdk-common library in their CDK projects to build AWS infrastructure with templated configurations.
+This guide explains how developers use the cdk-common library in their CDK projects to build AWS infrastructure with
+templated configurations.
 
 ## Project Setup
 
 ### 1. Add Dependency
+
 ```xml
 <dependency>
     <groupId>io.stxkxs</groupId>
@@ -16,6 +18,7 @@ This guide explains how developers use the cdk-common library in their CDK proje
 ```
 
 ### 2. Create Template Directory Structure
+
 ```
 src/main/resources/
 └── prototype/              # Start with prototype environment
@@ -26,6 +29,7 @@ src/main/resources/
 ```
 
 ### 3. Set CDK Context
+
 ```json
 // cdk.context.json
 {
@@ -54,6 +58,7 @@ src/main/resources/
 ## Development Workflow
 
 ### 1. Create Main Configuration Template
+
 ```yaml
 # src/main/resources/prototype/v1/conf.mustache
 host:
@@ -85,6 +90,7 @@ deployment:
 ```
 
 ### 2. Create Service Templates
+
 ```yaml
 # src/main/resources/prototype/v1/rds/database.mustache
 engine: postgres
@@ -101,6 +107,7 @@ tags:
 ```
 
 ### 3. Create CDK Stack
+
 ```java
 // Launch.java
 public class Launch {
@@ -129,6 +136,7 @@ public class Launch {
 ```
 
 ### 4. Use Constructs with Templates
+
 ```java
 // In your stack
 public class MyStack extends Stack {
@@ -145,6 +153,7 @@ public class MyStack extends Stack {
 ## Testing Your Templates
 
 ### 1. Validate Template Syntax
+
 ```bash
 # Test CDK synthesis
 cdk synth
@@ -154,6 +163,7 @@ cdk synth
 ```
 
 ### 2. Verify Variable Substitution
+
 ```bash
 # Enable debug logging to see processed templates
 export CDK_DEBUG=true
@@ -161,6 +171,7 @@ cdk synth
 ```
 
 ### 3. Test Different Environments
+
 ```bash
 # Test with production context
 cdk synth --context host:environment=production --context host:version=v1
@@ -171,6 +182,7 @@ cdk synth --context host:environment=production --context host:version=v1
 ### Prototype → Production
 
 1. **Create Production Templates**
+
 ```
 src/main/resources/
 ├── prototype/v1/...        # Development configs
@@ -178,6 +190,7 @@ src/main/resources/
 ```
 
 2. **Update Production Context**
+
 ```json
 // cdk.context.json for production
 {
@@ -190,6 +203,7 @@ src/main/resources/
 ```
 
 3. **Production-Specific Changes**
+
 ```yaml
 # production/v1/rds/database.mustache
 engine: postgres
@@ -202,6 +216,7 @@ deletionProtection: true           # Enable protection
 ## Common Patterns
 
 ### Custom Variables
+
 ```java
 // Add service-specific context
 var parsed = Template.parse(this, "database.mustache",
@@ -212,6 +227,7 @@ var parsed = Template.parse(this, "database.mustache",
 ```
 
 ### Conditional Templates
+
 ```yaml
 # Use Mustache sections for conditional content
 {{#production}}
@@ -226,6 +242,7 @@ backupRetentionPeriod: 1
 ```
 
 ### Template Composition
+
 ```yaml
 # conf.mustache - Reference other templates
 deployment:

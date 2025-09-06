@@ -1,5 +1,9 @@
 package io.stxkxs.execute.init;
 
+import static io.stxkxs.execute.serialization.Format.describe;
+import static io.stxkxs.execute.serialization.Format.exported;
+import static io.stxkxs.execute.serialization.Format.id;
+
 import io.stxkxs.execute.aws.ecr.EcrRepositoryConstruct;
 import io.stxkxs.execute.aws.s3.BucketConstruct;
 import io.stxkxs.model._main.Common;
@@ -12,8 +16,6 @@ import software.amazon.awscdk.NestedStackProps;
 import software.amazon.awscdk.services.ecr.Repository;
 import software.amazon.awscdk.services.s3.Bucket;
 import software.constructs.Construct;
-
-import static io.stxkxs.execute.serialization.Format.*;
 
 @Slf4j
 @Getter
@@ -29,18 +31,10 @@ public class SystemStorageConstruct extends NestedStack {
     this.cdkEcr = new EcrRepositoryConstruct(this, common, conf.ecr()).repository();
     this.cdkAssets = new BucketConstruct(this, common, conf.assets()).bucket();
 
-    CfnOutput.Builder
-      .create(this, id(common.id(), "cdk.ecr.assets.arn"))
-      .exportName(exported(scope, "cdkecrassetsarn"))
-      .value(this.cdkEcr().getRepositoryArn())
-      .description(describe(common, " repository arn"))
-      .build();
+    CfnOutput.Builder.create(this, id(common.id(), "cdk.ecr.assets.arn")).exportName(exported(scope, "cdkecrassetsarn"))
+      .value(this.cdkEcr().getRepositoryArn()).description(describe(common, " repository arn")).build();
 
-    CfnOutput.Builder
-      .create(this, id(common.id(), "cdk.bucket.assets.arn"))
-      .exportName(exported(scope, "cdkbucketassetsarn"))
-      .value(this.cdkAssets().getBucketArn())
-      .description(describe(common, "bucket assets arn"))
-      .build();
+    CfnOutput.Builder.create(this, id(common.id(), "cdk.bucket.assets.arn")).exportName(exported(scope, "cdkbucketassetsarn"))
+      .value(this.cdkAssets().getBucketArn()).description(describe(common, "bucket assets arn")).build();
   }
 }

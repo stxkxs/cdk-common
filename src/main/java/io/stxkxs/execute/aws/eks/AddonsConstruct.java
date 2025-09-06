@@ -1,10 +1,7 @@
 package io.stxkxs.execute.aws.eks;
 
-import io.stxkxs.execute.serialization.Mapper;
-import io.stxkxs.execute.serialization.Template;
-import io.stxkxs.model._main.Common;
-import io.stxkxs.model.aws.eks.KubernetesConf;
-import io.stxkxs.model.aws.eks.addon.AddonsConf;
+import static io.stxkxs.execute.serialization.Format.id;
+
 import io.stxkxs.execute.aws.eks.addon.AlloyOperatorConstruct;
 import io.stxkxs.execute.aws.eks.addon.AwsLoadBalancerConstruct;
 import io.stxkxs.execute.aws.eks.addon.AwsSecretsStoreConstruct;
@@ -12,13 +9,16 @@ import io.stxkxs.execute.aws.eks.addon.CertManagerConstruct;
 import io.stxkxs.execute.aws.eks.addon.CsiSecretsStoreConstruct;
 import io.stxkxs.execute.aws.eks.addon.GrafanaConstruct;
 import io.stxkxs.execute.aws.eks.addon.KarpenterConstruct;
+import io.stxkxs.execute.serialization.Mapper;
+import io.stxkxs.execute.serialization.Template;
+import io.stxkxs.model._main.Common;
+import io.stxkxs.model.aws.eks.KubernetesConf;
+import io.stxkxs.model.aws.eks.addon.AddonsConf;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import software.amazon.awscdk.services.eks.Cluster;
 import software.constructs.Construct;
-
-import static io.stxkxs.execute.serialization.Format.id;
 
 @Slf4j
 @Getter
@@ -57,6 +57,7 @@ public class AddonsConstruct extends Construct {
     this.karpenter().getNode().addDependency(this.grafana(), this.certManager(), this.csiSecretsStore(), this.awsSecretsStore());
 
     this.awsLoadBalancer = new AwsLoadBalancerConstruct(this, common, addons.awsLoadBalancer(), cluster);
-    this.awsLoadBalancer().getNode().addDependency(this.grafana(), this.certManager(), this.csiSecretsStore(), this.awsSecretsStore(), this.karpenter());
+    this.awsLoadBalancer().getNode().addDependency(this.grafana(), this.certManager(), this.csiSecretsStore(), this.awsSecretsStore(),
+      this.karpenter());
   }
 }

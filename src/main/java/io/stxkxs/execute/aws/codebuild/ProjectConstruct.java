@@ -1,11 +1,14 @@
 package io.stxkxs.execute.aws.codebuild;
 
+import static io.stxkxs.execute.serialization.Format.id;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.stxkxs.execute.aws.cloudwatch.LogGroupConstruct;
 import io.stxkxs.execute.serialization.Mapper;
 import io.stxkxs.execute.serialization.Template;
 import io.stxkxs.model._main.Common;
 import io.stxkxs.model.aws.codebuild.BuildProject;
+import java.util.Map;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -22,10 +25,6 @@ import software.amazon.awscdk.services.iam.IRole;
 import software.amazon.awscdk.services.logs.ILogGroup;
 import software.amazon.awscdk.services.s3.IBucket;
 import software.constructs.Construct;
-
-import java.util.Map;
-
-import static io.stxkxs.execute.serialization.Format.id;
 
 @Slf4j
 @Getter
@@ -52,36 +51,19 @@ public class ProjectConstruct extends Construct {
     this.role = role;
 
     this.logGroup = new LogGroupConstruct(scope, common, conf.logging().logGroup()).logGroup();
-    this.loggingOptions = LoggingOptions.builder()
-      .cloudWatch(CloudWatchLoggingOptions.builder()
-        .logGroup(this.logGroup())
-        .prefix(conf.logging().prefix())
-        .enabled(conf.logging().enabled())
-        .build())
-      .build();
+    this.loggingOptions = LoggingOptions.builder().cloudWatch(CloudWatchLoggingOptions.builder().logGroup(this.logGroup())
+      .prefix(conf.logging().prefix()).enabled(conf.logging().enabled()).build()).build();
 
-    if (conf.cache())
+    if (conf.cache()) {
       this.cache = Cache.bucket(assets);
-    else this.cache = Cache.none();
+    } else {
+      this.cache = Cache.none();
+    }
 
-    this.project = Builder
-      .create(scope, id("project", conf.name()))
-      .role(this.role())
-      .artifacts(Artifacts.s3(
-        S3ArtifactsProps.builder()
-          .bucket(assets)
-          .includeBuildId(true)
-          .build()))
-      .cache(this.cache())
-      .logging(this.loggingOptions())
-      .grantReportGroupPermissions(false)
-      .projectName(conf.name())
-      .description(conf.description())
-      .buildSpec(BuildSpec.fromObjectToYaml(buildspec))
-      .concurrentBuildLimit(conf.concurrentBuildLimit())
-      .environment(environment)
-      .environmentVariables(conf.environment().environmentVariables())
-      .badge(conf.badge())
-      .build();
+    this.project = Builder.create(scope, id("project", conf.name())).role(this.role())
+      .artifacts(Artifacts.s3(S3ArtifactsProps.builder().bucket(assets).includeBuildId(true).build())).cache(this.cache())
+      .logging(this.loggingOptions()).grantReportGroupPermissions(false).projectName(conf.name()).description(conf.description())
+      .buildSpec(BuildSpec.fromObjectToYaml(buildspec)).concurrentBuildLimit(conf.concurrentBuildLimit()).environment(environment)
+      .environmentVariables(conf.environment().environmentVariables()).badge(conf.badge()).build();
   }
 }

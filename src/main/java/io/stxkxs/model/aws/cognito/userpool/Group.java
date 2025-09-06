@@ -1,7 +1,3 @@
 package io.stxkxs.model.aws.cognito.userpool;
 
-public record Group(
-  String name,
-  String description,
-  int precedence
-) {}
+public record Group(String name, String description, int precedence) {}

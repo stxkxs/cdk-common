@@ -1,7 +1,3 @@
 package io.stxkxs.model.aws.ses;
 
-public record Reject(
-  boolean enabled,
-  String topic,
-  String configurationSet
-) {}
+public record Reject(boolean enabled, String topic, String configurationSet) {}

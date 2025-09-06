@@ -1,11 +1,15 @@
 package io.stxkxs.execute.aws.cognito;
 
+import static io.stxkxs.execute.serialization.Format.id;
+
 import io.stxkxs.execute.serialization.Mapper;
 import io.stxkxs.execute.serialization.Template;
 import io.stxkxs.model._main.Common;
 import io.stxkxs.model._main.Common.Maps;
 import io.stxkxs.model.aws.cognito.client.ClientAttributesConf;
 import io.stxkxs.model.aws.cognito.client.UserPoolClientConf;
+import java.security.InvalidParameterException;
+import java.util.List;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -22,11 +26,6 @@ import software.amazon.awscdk.services.cognito.UserPoolClient;
 import software.amazon.awscdk.services.cognito.UserPoolClientOptions;
 import software.constructs.Construct;
 
-import java.security.InvalidParameterException;
-import java.util.List;
-
-import static io.stxkxs.execute.serialization.Format.id;
-
 @Slf4j
 @Getter
 public class UserPoolClientConstruct extends Construct {
@@ -41,72 +40,40 @@ public class UserPoolClientConstruct extends Construct {
 
     log.debug("{} [common: {} conf: {}]", "UserPoolClientConstruct", common, conf);
 
-    this.userPoolClient = parent.addClient(
-      conf.name(),
-      UserPoolClientOptions.builder()
-        .userPoolClientName(conf.name())
+    this.userPoolClient = parent.addClient(conf.name(),
+      UserPoolClientOptions.builder().userPoolClientName(conf.name())
         .readAttributes(attributes(conf.readAttributes(), conf.customAttributes()))
         .writeAttributes(attributes(conf.writeAttributes(), conf.customAttributes()))
-        .accessTokenValidity(Duration.parse(conf.accessTokenValidity()))
-        .authSessionValidity(Duration.parse(conf.authSessionValidity()))
-        .refreshTokenValidity(Duration.parse(conf.refreshTokenValidity()))
-        .idTokenValidity(Duration.parse(conf.idTokenValidity()))
-        .enableTokenRevocation(conf.enableTokenRevocation())
-        .generateSecret(conf.generateSecret())
-        .disableOAuth(conf.disableOAuth())
+        .accessTokenValidity(Duration.parse(conf.accessTokenValidity())).authSessionValidity(Duration.parse(conf.authSessionValidity()))
+        .refreshTokenValidity(Duration.parse(conf.refreshTokenValidity())).idTokenValidity(Duration.parse(conf.idTokenValidity()))
+        .enableTokenRevocation(conf.enableTokenRevocation()).generateSecret(conf.generateSecret()).disableOAuth(conf.disableOAuth())
         .preventUserExistenceErrors(conf.preventUserExistenceErrors())
         .oAuth(OAuthSettings.builder()
-          .flows(OAuthFlows.builder()
-            .implicitCodeGrant(conf.oauth().implicitCodeGrant())
-            .clientCredentials(conf.oauth().clientCredentials())
-            .authorizationCodeGrant(conf.oauth().authorizationCodeGrant())
-            .build())
-          .scopes(conf.oauth().scopes().stream()
-            .map(UserPoolClientConstruct::scope)
-            .toList())
-          .callbackUrls(conf.oauth().callbackUrls())
-          .logoutUrls(conf.oauth().logoutUrls())
-          .build())
-        .authFlows(AuthFlow.builder()
-          .adminUserPassword(conf.authFlow().adminUserPassword())
-          .userPassword(conf.authFlow().userPassword())
-          .userSrp(conf.authFlow().userSrp())
-          .custom(conf.authFlow().custom())
-          .build())
+          .flows(OAuthFlows.builder().implicitCodeGrant(conf.oauth().implicitCodeGrant())
+            .clientCredentials(conf.oauth().clientCredentials()).authorizationCodeGrant(conf.oauth().authorizationCodeGrant()).build())
+          .scopes(conf.oauth().scopes().stream().map(UserPoolClientConstruct::scope).toList()).callbackUrls(conf.oauth().callbackUrls())
+          .logoutUrls(conf.oauth().logoutUrls()).build())
+        .authFlows(AuthFlow.builder().adminUserPassword(conf.authFlow().adminUserPassword()).userPassword(conf.authFlow().userPassword())
+          .userSrp(conf.authFlow().userSrp()).custom(conf.authFlow().custom()).build())
         .build());
 
     Maps.from(common.tags(), conf.tags()).forEach((key, value) -> Tags.of(parent).add(key, value));
   }
 
   private static ClientAttributes attributes(ClientAttributesConf conf, List<String> customAttributes) {
-    return new ClientAttributes()
-      .withStandardAttributes(
-        StandardAttributesMask.builder()
-          .address(conf.address())
-          .birthdate(conf.birthdate())
-          .email(conf.email())
-          .emailVerified(conf.email_verified())
-          .familyName(conf.family_name())
-          .fullname(conf.name())
-          .gender(conf.gender())
-          .givenName(conf.given_name())
-          .lastUpdateTime(conf.updated_at())
-          .locale(conf.locale())
-          .middleName(conf.middle_name())
-          .nickname(conf.nickname())
-          .phoneNumber(conf.phone_number())
-          .phoneNumberVerified(conf.phone_number_verified())
-          .preferredUsername(conf.preferred_username())
-          .profilePage(conf.profile_page())
-          .profilePicture(conf.profile_picture())
-          .timezone(conf.timezone())
-          .website(conf.website())
-          .build())
+    return new ClientAttributes().withStandardAttributes(StandardAttributesMask.builder().address(conf.address())
+      .birthdate(conf.birthdate()).email(conf.email()).emailVerified(conf.email_verified()).familyName(conf.family_name())
+      .fullname(conf.name()).gender(conf.gender()).givenName(conf.given_name()).lastUpdateTime(conf.updated_at()).locale(conf.locale())
+      .middleName(conf.middle_name()).nickname(conf.nickname()).phoneNumber(conf.phone_number())
+      .phoneNumberVerified(conf.phone_number_verified()).preferredUsername(conf.preferred_username()).profilePage(conf.profile_page())
+      .profilePicture(conf.profile_picture()).timezone(conf.timezone()).website(conf.website()).build())
       .withCustomAttributes(customAttributes.toArray(new String[0]));
   }
 
   private static OAuthScope scope(String scope) {
-    enum types {EMAIL, PHONE, COGNITO_ADMIN, PROFILE, OPENID}
+    enum types {
+      EMAIL, PHONE, COGNITO_ADMIN, PROFILE, OPENID
+    }
 
     if (scope.equalsIgnoreCase(types.EMAIL.name())) {
       return OAuthScope.EMAIL;
@@ -123,4 +90,3 @@ public class UserPoolClientConstruct extends Construct {
     throw new InvalidParameterException("error deciding oauth scope type for user pool client");
   }
 }
-

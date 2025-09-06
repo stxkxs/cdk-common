@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- code quality plugins -->
+<plugins>
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+        <version>${maven.pmd.plugin.version}</version>
+        <configuration>
+            <targetJdk>${maven.compiler.target}</targetJdk>
+            <includeTests>true</includeTests>
+            <failOnViolation>false</failOnViolation>
+            <printFailingErrors>true</printFailingErrors>
+        </configuration>
+    </plugin>
+
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>${maven.checkstyle.plugin.version}</version>
+        <configuration>
+            <configLocation>checkstyle.xml</configLocation>
+            <encoding>UTF-8</encoding>
+            <consoleOutput>true</consoleOutput>
+            <failsOnError>false</failsOnError>
+            <linkXRef>false</linkXRef>
+        </configuration>
+        <executions>
+            <execution>
+                <id>validate</id>
+                <phase>validate</phase>
+                <goals>
+                    <goal>check</goal>
+                </goals>
+            </execution>
+        </executions>
+    </plugin>
+
+    <plugin>
+        <groupId>com.github.spotbugs</groupId>
+        <artifactId>spotbugs-maven-plugin</artifactId>
+        <version>${spotbugs.maven.plugin.version}</version>
+        <configuration>
+            <xmlOutput>true</xmlOutput>
+            <xmlOutputDirectory>target</xmlOutputDirectory>
+            <failOnError>false</failOnError>
+            <threshold>Low</threshold>
+            <effort>Max</effort>
+            <excludeFilterFile>spotbugs-exclude.xml</excludeFilterFile>
+        </configuration>
+    </plugin>
+
+    <plugin>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
+        <version>${spotless.maven.plugin.version}</version>
+        <configuration>
+            <java>
+                <includes>
+                    <include>src/main/java/**/*.java</include>
+                    <include>src/test/java/**/*.java</include>
+                </includes>
+                <eclipse>
+                    <file>${project.basedir}/eclipse-formatter.xml</file>
+                </eclipse>
+                <importOrder/>
+                <removeUnusedImports/>
+                <trimTrailingWhitespace/>
+                <endWithNewline/>
+            </java>
+            <lineEndings>UNIX</lineEndings>
+        </configuration>
+        <executions>
+            <execution>
+                <goals>
+                    <goal>check</goal>
+                </goals>
+            </execution>
+        </executions>
+    </plugin>
+</plugins>

@@ -5,40 +5,44 @@
 ### Default Context Variables
 
 #### Host Variables (Physical Infrastructure)
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `{{host:id}}` | Application identifier | `myapp` |
-| `{{host:organization}}` | Organization name | `acme` |
-| `{{host:account}}` | AWS account ID | `123456789012` |
-| `{{host:region}}` | AWS region | `us-east-1` |
-| `{{host:name}}` | Application name | `my-application` |
-| `{{host:alias}}` | Environment alias | `dev`, `prod` |
-| `{{host:environment}}` | Environment type | `prototype`, `production` |
-| `{{host:version}}` | Template version | `v1`, `v2`, `v3` |
-| `{{host:domain}}` | Base domain | `example.com` |
+
+| Variable                | Description            | Example                   |
+|-------------------------|------------------------|---------------------------|
+| `{{host:id}}`           | Application identifier | `myapp`                   |
+| `{{host:organization}}` | Organization name      | `acme`                    |
+| `{{host:account}}`      | AWS account ID         | `123456789012`            |
+| `{{host:region}}`       | AWS region             | `us-east-1`               |
+| `{{host:name}}`         | Application name       | `my-application`          |
+| `{{host:alias}}`        | Environment alias      | `dev`, `prod`             |
+| `{{host:environment}}`  | Environment type       | `prototype`, `production` |
+| `{{host:version}}`      | Template version       | `v1`, `v2`, `v3`          |
+| `{{host:domain}}`       | Base domain            | `example.com`             |
 
 #### Hosted Variables (Logical Services)
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `{{hosted:id}}` | Service identifier | `myapp-api` |
-| `{{hosted:organization}}` | Service organization | `acme-corp` |
-| `{{hosted:account}}` | Target AWS account | `123456789012` |
-| `{{hosted:region}}` | Target AWS region | `us-east-1` |
-| `{{hosted:name}}` | Service name | `user-service` |
-| `{{hosted:alias}}` | Service alias | `api`, `web` |
-| `{{hosted:environment}}` | Service environment | `prototype`, `production` |
-| `{{hosted:version}}` | Service version | `v1`, `v2`, `v3` |
-| `{{hosted:domain}}` | Service domain | `api.example.com` |
+
+| Variable                  | Description          | Example                   |
+|---------------------------|----------------------|---------------------------|
+| `{{hosted:id}}`           | Service identifier   | `myapp-api`               |
+| `{{hosted:organization}}` | Service organization | `acme-corp`               |
+| `{{hosted:account}}`      | Target AWS account   | `123456789012`            |
+| `{{hosted:region}}`       | Target AWS region    | `us-east-1`               |
+| `{{hosted:name}}`         | Service name         | `user-service`            |
+| `{{hosted:alias}}`        | Service alias        | `api`, `web`              |
+| `{{hosted:environment}}`  | Service environment  | `prototype`, `production` |
+| `{{hosted:version}}`      | Service version      | `v1`, `v2`, `v3`          |
+| `{{hosted:domain}}`       | Service domain       | `api.example.com`         |
 
 #### Computed Variables
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `{{home}}` | Base template path | `/` |
+
+| Variable               | Description          | Default               |
+|------------------------|----------------------|-----------------------|
+| `{{home}}`             | Base template path   | `/`                   |
 | `{{synthesizer:name}}` | CDK synthesizer name | `default-synthesizer` |
 
 ## Common Template Patterns
 
 ### Resource Naming
+
 ```yaml
 # Standard naming pattern
 name: "{{hosted:id}}-{{service}}"
@@ -54,6 +58,7 @@ roleArn: "arn:aws:iam::{{hosted:account}}:role/{{hosted:id}}-role"
 ```
 
 ### Tagging Patterns
+
 ```yaml
 tags:
   "{{hosted:domain}}:resource-type": "bucket"
@@ -69,6 +74,7 @@ tags:
 ```
 
 ### Conditional Content
+
 ```yaml
 # Environment-specific configuration
 {{#production}}
@@ -85,6 +91,7 @@ instanceType: db.t3.micro
 ```
 
 ### Nested Template References
+
 ```yaml
 # Reference other templates
 deployment:
@@ -103,6 +110,7 @@ customPolicies:
 ## Template Directory Structure
 
 ### Standard Layout
+
 ```
 src/main/resources/
 ├── {environment}/              # prototype, production  
@@ -127,16 +135,19 @@ src/main/resources/
 ### Template Categories
 
 #### Service Templates
+
 - **Purpose:** Configure specific AWS services
 - **Location:** `{service}/` subdirectories
 - **Examples:** `rds/database.mustache`, `eks/cluster.mustache`
 
-#### Policy Templates  
+#### Policy Templates
+
 - **Purpose:** IAM policies and permissions
 - **Location:** `policy/` directory
 - **Examples:** `policy/s3-access.mustache`, `policy/lambda-execution.mustache`
 
 #### Static Resources
+
 - **Purpose:** Non-templated YAML/JSON files
 - **Location:** Mixed with templates
 - **Examples:** `eks/storage-class.yaml`
@@ -144,6 +155,7 @@ src/main/resources/
 ## CDK Integration Patterns
 
 ### Basic Template Usage
+
 ```java
 // Simple template parsing
 var config = Template.parse(scope, "database.mustache");
@@ -155,6 +167,7 @@ var config = Template.parse(scope, "database.mustache",
 ```
 
 ### Construct Integration
+
 ```java
 public class DatabaseConstruct extends Construct {
   public DatabaseConstruct(Scope scope, Common common, String templatePath) {
@@ -175,6 +188,7 @@ public class DatabaseConstruct extends Construct {
 ```
 
 ### Context Configuration
+
 ```json
 // cdk.context.json
 {
@@ -194,33 +208,42 @@ public class DatabaseConstruct extends Construct {
 ### Common Errors
 
 #### Template Not Found
+
 ```
 error parsing template! can not find prototype/v1/missing.mustache.
 ```
+
 **Fix:** Create template file or check environment/version context
 
 #### Missing Context Variable
+
 ```
 java.lang.NullPointerException: Cannot invoke "toString()" because 
 the return value of "getContext(String)" is null
 ```
+
 **Fix:** Add missing context variable to `cdk.context.json`
 
 #### YAML Syntax Error
+
 ```
 com.fasterxml.jackson.dataformat.yaml.snakeyaml.error.YAMLException:
   mapping values are not allowed here
 ```
+
 **Fix:** Check YAML indentation and syntax
 
 #### Unrecognized Property
+
 ```
 com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException:
   Unrecognized field "invalidField"
 ```
+
 **Fix:** Add field to Java class or remove from YAML
 
 ### Debug Commands
+
 ```bash
 # Enable CDK debug output
 export CDK_DEBUG=true
@@ -236,18 +259,21 @@ cdk synth --validation
 ## Performance Tips
 
 ### Template Optimization
+
 - Keep templates small and focused
 - Minimize nested template references
 - Use efficient POJO structures
 - Cache frequently used configurations
 
-### Context Optimization  
+### Context Optimization
+
 - Set context at appropriate scope level
 - Avoid redundant context variables
 - Use computed variables for derived values
 - Validate required context early
 
 ### Build Optimization
+
 - Use incremental builds when possible
 - Minimize template processing in constructors
 - Batch similar resource creation

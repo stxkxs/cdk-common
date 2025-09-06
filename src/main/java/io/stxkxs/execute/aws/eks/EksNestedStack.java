@@ -1,5 +1,7 @@
 package io.stxkxs.execute.aws.eks;
 
+import static io.stxkxs.execute.serialization.Format.id;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.fabric8.kubernetes.client.utils.Serialization;
@@ -13,6 +15,11 @@ import io.stxkxs.model.aws.eks.RbacConf;
 import io.stxkxs.model.aws.eks.TenancyConf;
 import io.stxkxs.model.aws.eks.Tenant;
 import io.stxkxs.model.aws.sqs.Sqs;
+import java.security.InvalidParameterException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -32,77 +39,76 @@ import software.amazon.awscdk.services.iam.Role;
 import software.amazon.awscdk.services.sqs.IQueue;
 import software.constructs.Construct;
 
-import java.security.InvalidParameterException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import static io.stxkxs.execute.serialization.Format.id;
-
 /**
- * Comprehensive Amazon EKS (Elastic Kubernetes Service) orchestration construct that provisions 
- * a complete, production-ready Kubernetes cluster with all associated components.
- * 
- * <p>This nested stack serves as the main orchestrator for EKS infrastructure, coordinating
- * multiple complex sub-constructs to create a fully functional Kubernetes environment:
- * 
- * <p><b>Core Components:</b>
+ * Comprehensive Amazon EKS (Elastic Kubernetes Service) orchestration construct that provisions a complete, production-ready Kubernetes
+ * cluster with all associated components.
+ *
+ * <p>
+ * This nested stack serves as the main orchestrator for EKS infrastructure, coordinating multiple complex sub-constructs to create a fully
+ * functional Kubernetes environment:
+ *
+ * <p>
+ * <b>Core Components:</b>
  * <ul>
- *   <li><b>EKS Cluster</b> - Main Kubernetes control plane with custom endpoint access and logging</li>
- *   <li><b>Node Groups</b> - Managed EC2 worker nodes with auto-scaling and custom AMI support</li>
- *   <li><b>Managed Add-ons</b> - AWS-managed components (VPC CNI, kube-proxy, CoreDNS, EBS CSI)</li>
- *   <li><b>Custom Add-ons</b> - Helm chart deployments (Grafana, cert-manager, Karpenter, AWS Load Balancer Controller)</li>
- *   <li><b>Observability</b> - CloudWatch monitoring, logging, dashboards, and alerting</li>
- *   <li><b>Interrupt Handling</b> - SQS queue for spot instance interruption notifications</li>
+ * <li><b>EKS Cluster</b> - Main Kubernetes control plane with custom endpoint access and logging</li>
+ * <li><b>Node Groups</b> - Managed EC2 worker nodes with auto-scaling and custom AMI support</li>
+ * <li><b>Managed Add-ons</b> - AWS-managed components (VPC CNI, kube-proxy, CoreDNS, EBS CSI)</li>
+ * <li><b>Custom Add-ons</b> - Helm chart deployments (Grafana, cert-manager, Karpenter, AWS Load Balancer Controller)</li>
+ * <li><b>Observability</b> - CloudWatch monitoring, logging, dashboards, and alerting</li>
+ * <li><b>Interrupt Handling</b> - SQS queue for spot instance interruption notifications</li>
  * </ul>
- * 
- * <p><b>Advanced Features:</b>
+ *
+ * <p>
+ * <b>Advanced Features:</b>
  * <ul>
- *   <li>Multi-tenant RBAC configuration with role-based access control</li>
- *   <li>AWS IAM to Kubernetes RBAC integration via aws-auth ConfigMap</li>
- *   <li>Dynamic tenant management from CDK context injection</li>
- *   <li>Template-based configuration with mustache processing</li>
- *   <li>Complex dependency orchestration ensuring proper startup order</li>
- *   <li>Kubernetes manifest deployment for custom resources</li>
+ * <li>Multi-tenant RBAC configuration with role-based access control</li>
+ * <li>AWS IAM to Kubernetes RBAC integration via aws-auth ConfigMap</li>
+ * <li>Dynamic tenant management from CDK context injection</li>
+ * <li>Template-based configuration with mustache processing</li>
+ * <li>Complex dependency orchestration ensuring proper startup order</li>
+ * <li>Kubernetes manifest deployment for custom resources</li>
  * </ul>
- * 
- * <p><b>Dependency Chain:</b>
+ *
+ * <p>
+ * <b>Dependency Chain:</b>
+ *
  * <pre>
  * EKS Cluster (base)
  *   ↓
- * Interrupt Queue → Node Groups ← Managed Add-ons  
+ * Interrupt Queue → Node Groups ← Managed Add-ons
  *   ↓                    ↓              ↓
  * Custom Add-ons ←────────────────────────
  *   ↓
  * Observability (final)
  * </pre>
- * 
- * <p><b>Security & Access Control:</b>
+ *
+ * <p>
+ * <b>Security & Access Control:</b>
  * <ul>
- *   <li>Configurable cluster endpoint access (public, private, or both)</li>
- *   <li>Integration with AWS IAM for cluster and node group roles</li>
- *   <li>Support for hosted tenant administrators and users</li>
- *   <li>Kubernetes RBAC policies for fine-grained permissions</li>
+ * <li>Configurable cluster endpoint access (public, private, or both)</li>
+ * <li>Integration with AWS IAM for cluster and node group roles</li>
+ * <li>Support for hosted tenant administrators and users</li>
+ * <li>Kubernetes RBAC policies for fine-grained permissions</li>
  * </ul>
- * 
- * <p><b>Usage Example:</b>
+ *
+ * <p>
+ * <b>Usage Example:</b>
+ *
  * <pre>{@code
- * EksNestedStack eksStack = new EksNestedStack(
- *     app, common, kubernetesConfig, vpc, stackProps);
- *     
+ * EksNestedStack eksStack = new EksNestedStack(app, common, kubernetesConfig, vpc, stackProps);
+ *
  * // Provides access to:
  * Cluster cluster = eksStack.getCluster();
  * IQueue interruptQueue = eksStack.getInterruptQueue();
  * ManagedAddonsConstruct managedAddons = eksStack.getManagedAddonsConstruct();
  * }</pre>
- * 
+ *
  * @author CDK Common Framework
- * @since 1.0.0
  * @see ManagedAddonsConstruct for AWS-managed EKS add-ons
- * @see NodeGroupsConstruct for worker node management  
+ * @see NodeGroupsConstruct for worker node management
  * @see AddonsConstruct for Helm chart deployments
  * @see ObservabilityConstruct for monitoring and alerting
+ * @since 1.0.0
  */
 @Slf4j
 @Getter
@@ -135,11 +141,14 @@ public class EksNestedStack extends NestedStack {
     this.addonsConstruct().getNode().addDependency(this.managedAddonsConstruct(), this.nodeGroupsConstruct());
 
     this.observabilityConstruct = new ObservabilityConstruct(this, common, conf.observability());
-    this.observabilityConstruct().getNode().addDependency(this.managedAddonsConstruct(), this.nodeGroupsConstruct(), this.addonsConstruct());
+    this.observabilityConstruct().getNode().addDependency(this.managedAddonsConstruct(), this.nodeGroupsConstruct(),
+      this.addonsConstruct());
   }
 
   private static EndpointAccess type(String endpointAccess) {
-    enum types {PUBLIC_AND_PRIVATE, PRIVATE, PUBLIC}
+    enum types {
+      PUBLIC_AND_PRIVATE, PRIVATE, PUBLIC
+    }
     if (endpointAccess.equalsIgnoreCase(types.PUBLIC_AND_PRIVATE.name())) {
       return EndpointAccess.PUBLIC_AND_PRIVATE;
     } else if (endpointAccess.equalsIgnoreCase(types.PRIVATE.name())) {
@@ -153,27 +162,13 @@ public class EksNestedStack extends NestedStack {
 
   @SneakyThrows
   private Cluster cluster(Common common, KubernetesConf conf, Vpc vpc) {
-    var eks = Cluster.Builder
-      .create(this, conf.name())
-      .clusterName(conf.name())
-      .version(KubernetesVersion.of(conf.version()))
-      .endpointAccess(type(conf.endpointAccess()))
-      .vpc(vpc)
+    var eks = Cluster.Builder.create(this, conf.name()).clusterName(conf.name()).version(KubernetesVersion.of(conf.version()))
+      .endpointAccess(type(conf.endpointAccess())).vpc(vpc)
       .vpcSubnets(conf.vpcSubnetTypes().stream()
-        .map(type -> SubnetSelection.builder()
-          .subnetType(SubnetType.valueOf(type.toUpperCase()))
-          .build())
-        .toList())
-      .placeClusterHandlerInVpc(true)
-      .kubectlLayer(new KubectlV33Layer(this, id("kubectl", conf.name())))
-      .defaultCapacity(0)
-      .clusterLogging(
-        conf.loggingTypes().stream()
-          .map(String::toUpperCase)
-          .map(ClusterLoggingTypes::valueOf).toList())
-      .prune(conf.prune())
-      .tags(Common.Maps.from(common.tags(), conf.tags()))
-      .build();
+        .map(type -> SubnetSelection.builder().subnetType(SubnetType.valueOf(type.toUpperCase())).build()).toList())
+      .placeClusterHandlerInVpc(true).kubectlLayer(new KubectlV33Layer(this, id("kubectl", conf.name()))).defaultCapacity(0)
+      .clusterLogging(conf.loggingTypes().stream().map(String::toUpperCase).map(ClusterLoggingTypes::valueOf).toList()).prune(conf.prune())
+      .tags(Common.Maps.from(common.tags(), conf.tags())).build();
 
     rbac(conf, eks);
     awsAuthConfigMap(conf, eks);
@@ -184,27 +179,18 @@ public class EksNestedStack extends NestedStack {
   @SneakyThrows
   private void awsAuthConfigMap(KubernetesConf conf, Cluster eks) {
     var mapper = Mapper.get();
-    var parsed = Template.parse(this, conf.tenancy(), Map.ofEntries(
-      Map.entry("hosted:eks:administrators", tenant("hosted:eks:administrators")),
-      Map.entry("hosted:eks:users", tenant("hosted:eks:users"))));
+    var parsed =
+      Template.parse(this, conf.tenancy(), Map.ofEntries(Map.entry("hosted:eks:administrators", tenant("hosted:eks:administrators")),
+        Map.entry("hosted:eks:users", tenant("hosted:eks:users"))));
     var tenancy = mapper.readValue(parsed, TenancyConf.class);
 
-    tenancy.administrators()
-      .forEach(administrator -> eks.getAwsAuth()
-        .addMastersRole(Role.fromRoleArn(this, String.format("%s-admin-lookup", administrator.role()), administrator.role())));
+    tenancy.administrators().forEach(administrator -> eks.getAwsAuth()
+      .addMastersRole(Role.fromRoleArn(this, String.format("%s-admin-lookup", administrator.role()), administrator.role())));
 
-    Optional.ofNullable(tenancy.users())
-      .filter(users -> !users.isEmpty())
-      .ifPresent(users -> users.forEach(user ->
-        eks.getAwsAuth()
-          .addRoleMapping(
-            Role.fromRoleArn(this, String.format("%s-user-lookup", user.role()), user.role()),
-            AwsAuthMapping.builder()
-              .username(user.username())
-              .groups(List.of("eks:read-only"))
-              .build()
-          )
-      ));
+    Optional.ofNullable(tenancy.users()).filter(users -> !users.isEmpty())
+      .ifPresent(users -> users
+        .forEach(user -> eks.getAwsAuth().addRoleMapping(Role.fromRoleArn(this, String.format("%s-user-lookup", user.role()), user.role()),
+          AwsAuthMapping.builder().username(user.username()).groups(List.of("eks:read-only")).build())));
   }
 
   private void rbac(KubernetesConf conf, Cluster eks) throws JsonProcessingException {
@@ -212,25 +198,15 @@ public class EksNestedStack extends NestedStack {
     var parsed = Template.parse(this, conf.rbac());
     var rbac = Serialization.unmarshal(parsed, RbacConf.class);
 
-    var userClusterRoleBindingManifest = mapper.readValue(Serialization.asYaml(rbac.userClusterRoleBinding()), new TypeReference<Map<String, Object>>() {});
-    KubernetesManifest.Builder
-      .create(this, "user-cluster-role-binding")
-      .cluster(eks)
-      .overwrite(true)
-      .prune(true)
-      .skipValidation(true)
-      .manifest(List.of(userClusterRoleBindingManifest))
-      .build();
+    var userClusterRoleBindingManifest =
+      mapper.readValue(Serialization.asYaml(rbac.userClusterRoleBinding()), new TypeReference<Map<String, Object>>() {});
+    KubernetesManifest.Builder.create(this, "user-cluster-role-binding").cluster(eks).overwrite(true).prune(true).skipValidation(true)
+      .manifest(List.of(userClusterRoleBindingManifest)).build();
 
-    var userClusterRoleManifest = mapper.readValue(Serialization.asYaml(rbac.userClusterRole()), new TypeReference<Map<String, Object>>() {});
-    KubernetesManifest.Builder
-      .create(this, "user-cluster-role")
-      .cluster(eks)
-      .overwrite(true)
-      .prune(true)
-      .skipValidation(true)
-      .manifest(List.of(userClusterRoleManifest))
-      .build();
+    var userClusterRoleManifest =
+      mapper.readValue(Serialization.asYaml(rbac.userClusterRole()), new TypeReference<Map<String, Object>>() {});
+    KubernetesManifest.Builder.create(this, "user-cluster-role").cluster(eks).overwrite(true).prune(true).skipValidation(true)
+      .manifest(List.of(userClusterRoleManifest)).build();
   }
 
   private List<Tenant> tenant(String type) {

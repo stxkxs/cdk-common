@@ -5,6 +5,7 @@
 These variables are automatically extracted from CDK context and available in all templates:
 
 ### Host Variables
+
 ```yaml
 host:id: "myapp"
 host:organization: "acme"
@@ -18,6 +19,7 @@ host:domain: "example.com"
 ```
 
 ### Hosted Variables
+
 ```yaml
 hosted:id: "myapp-prod"
 hosted:organization: "acme-corp"
@@ -31,6 +33,7 @@ hosted:domain: "api.example.com"
 ```
 
 ### Computed Variables
+
 ```yaml
 home: "/"
 synthesizer:name: "default-synthesizer"
@@ -39,6 +42,7 @@ synthesizer:name: "default-synthesizer"
 ## Usage in Templates
 
 ### Basic Substitution
+
 ```yaml
 # Template
 name: {{hosted:id}}-bucket
@@ -50,6 +54,7 @@ region: us-east-1
 ```
 
 ### Tag Patterns
+
 ```yaml
 # Template
 tags:
@@ -65,6 +70,7 @@ tags:
 ```
 
 ### ARN Construction
+
 ```yaml
 # Template
 roleArn: "arn:aws:iam::{{hosted:account}}:role/{{hosted:id}}-role"
@@ -89,6 +95,7 @@ var parsed = Template.parse(app, "conf.mustache",
 ```
 
 ### Custom Variable Usage
+
 ```yaml
 # Template with custom variables
 druid:

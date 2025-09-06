@@ -1,6 +1,3 @@
 package io.stxkxs.model.aws.cognito.userpool;
 
-public record AutoVerify(
-  boolean email,
-  boolean phone
-) {}
+public record AutoVerify(boolean email, boolean phone) {}

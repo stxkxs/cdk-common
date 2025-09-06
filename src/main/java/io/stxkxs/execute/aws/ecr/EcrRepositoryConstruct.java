@@ -1,5 +1,7 @@
 package io.stxkxs.execute.aws.ecr;
 
+import static io.stxkxs.execute.serialization.Format.id;
+
 import io.stxkxs.execute.aws.kms.KmsConstruct;
 import io.stxkxs.model._main.Common;
 import io.stxkxs.model.aws.ecr.EcrRepository;
@@ -9,8 +11,6 @@ import software.amazon.awscdk.Tags;
 import software.amazon.awscdk.services.ecr.Repository;
 import software.amazon.awscdk.services.ecr.RepositoryEncryption;
 import software.constructs.Construct;
-
-import static io.stxkxs.execute.serialization.Format.id;
 
 @Slf4j
 @Getter
@@ -22,13 +22,8 @@ public class EcrRepositoryConstruct extends Construct {
 
     log.debug("{} [common: {} conf: {}]", "EcrRepositoryConstruct", common, conf);
 
-    var ecr = Repository.Builder
-      .create(scope, "ecr")
-      .repositoryName(conf.name())
-      .imageTagMutability(conf.tagMutability())
-      .imageScanOnPush(conf.scanOnPush())
-      .emptyOnDelete(conf.emptyOnDelete())
-      .removalPolicy(conf.removalPolicy());
+    var ecr = Repository.Builder.create(scope, "ecr").repositoryName(conf.name()).imageTagMutability(conf.tagMutability())
+      .imageScanOnPush(conf.scanOnPush()).emptyOnDelete(conf.emptyOnDelete()).removalPolicy(conf.removalPolicy());
 
     if (conf.encryption().enabled()) {
       if (conf.encryption().kms() != null) {
