@@ -13,7 +13,7 @@ When CDK runs (`cdk synth` or `cdk deploy`), it provides context variables to co
 
 ```java
 // Template.java:71-88 - Default context variables extracted
-var version = Version.of(scope.getNode().getContext("host:version"));
+var version 1.0.0= Version.of(scope.getNode().getContext("host:version"));
 var environment = Environment.of(scope.getNode().getContext("host:environment"));
 ```
 

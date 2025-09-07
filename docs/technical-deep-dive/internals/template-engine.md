@@ -186,7 +186,7 @@ Map.entry("host:id", scope.getNode().getContext("host:id").toString())
 
 ```java
 // Template.java:24-25,31-32
-var version = Version.of(scope.getNode().getContext("host:version"));
+var version 1.0.0= Version.of(scope.getNode().getContext("host:version"));
 var environment = Environment.of(scope.getNode().getContext("host:environment"));
 ```
 

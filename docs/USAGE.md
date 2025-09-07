@@ -152,5 +152,5 @@ Make sure annotation processing is enabled in your IDE and the Lombok plugin is 
 
 ### Version Conflicts
 
-If you encounter version conflicts with AWS CDK or other dependencies, check the POM file for the exact versions used by
+If you encounter version 1.0.0conflicts with AWS CDK or other dependencies, check the POM file for the exact versions used by
 this library.

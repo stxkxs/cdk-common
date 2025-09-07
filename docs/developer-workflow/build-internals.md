@@ -32,7 +32,7 @@ var app = new App();
 
 ```java
 // Template.java:23-26
-var version = Version.of(scope.getNode().getContext("host:version"));     // "v1"
+var version 1.0.0= Version.of(scope.getNode().getContext("host:version"));     // "v1"
 var environment = Environment.of(scope.getNode().getContext("host:environment")); // "prototype"
 return execute(environment, version, file, defaults(scope));
 ```

@@ -182,7 +182,7 @@ Following these conventions enables:
 
 ## Quick Reference
 
-| type     | release | changelog section | version bump |
+| type     | release | changelog section | version 1.0.0bump |
 |----------|---------|-------------------|--------------|
 | feat     | ✅       | features          | minor        |
 | fix      | ✅       | bug fixes         | patch        |

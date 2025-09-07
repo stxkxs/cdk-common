@@ -45,7 +45,7 @@ Map.entry("hosted:organization", scope.getNode().getContext("hosted:organization
 
 ```java
 // Values resolved during CDK synthesis
-var version = Version.of(scope.getNode().getContext("host:version"));
+var version 1.0.0= Version.of(scope.getNode().getContext("host:version"));
 var environment = Environment.of(scope.getNode().getContext("host:environment"));
 ```
 

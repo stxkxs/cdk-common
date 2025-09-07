@@ -15,7 +15,7 @@
 | `{{host:name}}`         | Application name       | `my-application`          |
 | `{{host:alias}}`        | Environment alias      | `dev`, `prod`             |
 | `{{host:environment}}`  | Environment type       | `prototype`, `production` |
-| `{{host:version}}`      | Template version       | `v1`, `v2`, `v3`          |
+| `{{host:version}}`      | Template version 1.0.0      | `v1`, `v2`, `v3`          |
 | `{{host:domain}}`       | Base domain            | `example.com`             |
 
 #### Hosted Variables (Logical Services)
@@ -29,7 +29,7 @@
 | `{{hosted:name}}`         | Service name         | `user-service`            |
 | `{{hosted:alias}}`        | Service alias        | `api`, `web`              |
 | `{{hosted:environment}}`  | Service environment  | `prototype`, `production` |
-| `{{hosted:version}}`      | Service version      | `v1`, `v2`, `v3`          |
+| `{{hosted:version}}`      | Service version 1.0.0     | `v1`, `v2`, `v3`          |
 | `{{hosted:domain}}`       | Service domain       | `api.example.com`         |
 
 #### Computed Variables
@@ -213,7 +213,7 @@ public class DatabaseConstruct extends Construct {
 error parsing template! can not find prototype/v1/missing.mustache.
 ```
 
-**Fix:** Create template file or check environment/version context
+**Fix:** Create template file or check environment/version 1.0.0context
 
 #### Missing Context Variable
 

@@ -7,12 +7,12 @@ This project uses GitHub Actions to automate the release process. There are two 
 1. Go to the [Actions tab](../../actions) in your GitHub repository
 2. Select "Publish Release" workflow
 3. Click "Run workflow"
-4. Enter the version number (e.g., `1.0.0`)
+4. Enter the version 1.0.0number (e.g., `1.0.0`)
 5. Click "Run workflow"
 
 The workflow will:
 
-- Validate the version format
+- Validate the version 1.0.0format
 - Build and test the code
 - Create a Git tag (if permissions allow)
 - Create a GitHub release
@@ -58,10 +58,10 @@ If you see "Write access to repository not granted" when using workflow_dispatch
 
 ### Release Already Exists
 
-If a release with the same version already exists:
+If a release with the same version 1.0.0already exists:
 
 - Delete the existing release and tag from GitHub
-- Or use a different version number
+- Or use a different version 1.0.0number
 
 ### Build Failures
 
@@ -76,7 +76,7 @@ If the build fails:
 If needed, you can create a release manually:
 
 ```bash
-# Update version in pom.xml
+# Update version 1.0.0in pom.xml
 mvn versions:set -DnewVersion=1.0.0
 mvn versions:commit
 
@@ -99,7 +99,7 @@ git push origin v1.0.0
 
 After a successful release:
 
-1. The version badge in README.md will be automatically updated (if present)
+1. The version 1.0.0badge in README.md will be automatically updated (if present)
 2. Download and verify the artifacts from the release page
 3. Update any dependent projects to use the new version
 4. Consider announcing the release if it contains significant changes

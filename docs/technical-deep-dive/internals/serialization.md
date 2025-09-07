@@ -234,9 +234,9 @@ var config = Mapper.get().readValue(yamlString, ConfigClass.class);
 **Step 3: Type Conversion**
 
 ```java  
-// String → Enum conversion (case-insensitive)
-// String → Primitive conversion  
-// Map → Custom object conversion (recursive)
+// String → Enum conversion 1.0.0(case-insensitive)
+// String → Primitive conversion 1.0.0 
+// Map → Custom object conversion 1.0.0(recursive)
 // List → Collection conversion
 ```
 

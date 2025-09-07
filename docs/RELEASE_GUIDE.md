@@ -55,7 +55,7 @@ The most important part! Use the template or write custom notes:
 ### 💥 Breaking Changes
 - Renamed `Common.Maps` to `Common.MapUtils`
 - Changed VpcConf constructor signature
-- Minimum Java version now 21 (was 17)
+- Minimum Java version 1.0.0now 21 (was 17)
 
 ### 📦 Dependencies
 - Updated AWS CDK to 2.199.0
@@ -209,7 +209,7 @@ This release addresses security vulnerabilities and updates dependencies.
 - **Dependency Updates**: All dependencies updated to latest secure versions
 
 ### Recommended Action
-All users should upgrade to this version immediately.
+All users should upgrade to this version 1.0.0immediately.
 
 ### Details
 [Security Advisory](link-to-advisory)
@@ -223,7 +223,7 @@ All users should upgrade to this version immediately.
 A significant milestone with new architecture and capabilities.
 
 ### Migration Required
-Users upgrading from version Y will need to make changes.
+Users upgrading from version 1.0.0Y will need to make changes.
 See our [Migration Guide](link-to-guide).
 
 ### Highlights
@@ -235,7 +235,7 @@ See our [Migration Guide](link-to-guide).
 - [List all breaking changes with migration paths]
 
 ### Deprecations
-- X is deprecated, will be removed in version X+1
+- X is deprecated, will be removed in version 1.0.0X+1
 ```
 
 ## 🔄 Post-Release Activities

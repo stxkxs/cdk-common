@@ -88,16 +88,16 @@ templates/
 #### Environment Variables Only
 
 Using environment variables for template selection without path structure.
-**Rejected:** Less predictable, harder to organize, no version support
+**Rejected:** Less predictable, harder to organize, no version 1.0.0support
 
 #### Git Branch Strategy
 
 Different branches for different environments.
-**Rejected:** Complicates deployment, version management becomes difficult
+**Rejected:** Complicates deployment, version 1.0.0management becomes difficult
 
 ## Implementation Notes
 
 - Templates loaded via ClassLoader from `src/main/resources/{environment}/{version}/`
 - Missing templates throw runtime exceptions with full path details
-- Environment/version extracted from CDK context during build
+- Environment/version 1.0.0extracted from CDK context during build
 - Consumer projects provide templates matching their deployment needs
