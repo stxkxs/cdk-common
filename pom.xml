@@ -32,7 +32,7 @@
         <commons.text.version>1.14.0</commons.text.version>
         <commons.codec.version>1.19.0</commons.codec.version>
         <log4j2.version>2.25.1</log4j2.version>
-        <junit.version>5.11.4</junit.version>
+        <junit.version>5.13.4</junit.version>
         <maven.surefire.plugin.version>3.5.2</maven.surefire.plugin.version>
     </properties>
 
