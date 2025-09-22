@@ -17,7 +17,7 @@
         <maven.compiler.plugin.version>3.14.0</maven.compiler.plugin.version>
         <maven.exec.plugin.version>3.5.0</maven.exec.plugin.version>
         <maven.clean.plugin.version>3.4.0</maven.clean.plugin.version>
-        <spotless.maven.plugin.version>2.45.0</spotless.maven.plugin.version>
+        <spotless.maven.plugin.version>2.46.1</spotless.maven.plugin.version>
         <cdk.version>2.214.0</cdk.version>
         <aws.sdk.version>2.33.4</aws.sdk.version>
         <aws.cognito.identitypool.version>2.186.0-alpha.0</aws.cognito.identitypool.version>
