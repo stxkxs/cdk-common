@@ -23,7 +23,7 @@
         <aws.cognito.identitypool.version>2.186.0-alpha.0</aws.cognito.identitypool.version>
         <constructs.version>[10.4.0,11.0.0)</constructs.version>
         <cdk.kubectl.version>2.0.0</cdk.kubectl.version>
-        <kubernetes.models.version>7.3.1</kubernetes.models.version>
+        <kubernetes.models.version>7.4.0</kubernetes.models.version>
         <lombok.version>1.18.42</lombok.version>
         <jackson.version>2.20.0</jackson.version>
         <mustache.version>0.9.14</mustache.version>
